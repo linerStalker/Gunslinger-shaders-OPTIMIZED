@@ -14,11 +14,11 @@ vf main (v_lmap v)
 {
 	vf 		o;
 
-	float3 	N=unpack_normal		(v.N);
+	float3 	N=unpack_bx2		(v.N);
 	o.hpos=mul			(m_VP,v.P);//xform,input in world coords
-	o.tc0=unpack_tc_base	(v.uv0,v.T.w,v.B.w);//copy tc
+	o.tc0=unpack_tc_base	(v.uv0.xy,v.T.w,v.B.w);//copy tc
 	o.tc1=o.tc0;//copy tc
-	o.c0=v_hemi		(N);//hemi
+	o.c0=v_hemi		();
 	o.c1=v_sun			(N);//sun
 	o.fog=calc_fogging 		(v.P);//fog,input in world coords
 

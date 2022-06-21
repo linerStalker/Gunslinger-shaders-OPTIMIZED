@@ -40,10 +40,9 @@ float4	calc_point 	(out float2 tc_att0,out float2 tc_att1,float4 w_pos,float3 w_
 	return 	L_dynamic_color*L_scale*saturate(calc_fogging(w_pos));
 }
 float3	calc_sun		(float3 norm_w)	{return L_sun_color*max(dot((norm_w),-L_sun_dir_w),0);}
-float3 	calc_model_hemi 	(float3 norm_w)	{return (norm_w.y*0.5+0.5)*L_dynamic_props.w*L_hemi_color;}
-float3	calc_model_lq_lighting	(float3 norm_w){return calc_model_hemi(norm_w)+L_ambient+L_dynamic_props.xyz*calc_sun(norm_w);}
-float3 	_calc_model_hemi 	(float3 norm_w)	{return max(0,norm_w.y)*.2*L_hemi_color;}
-float3	_calc_model_lq_lighting	(float3 norm_w){return calc_model_hemi(norm_w)+L_ambient+.5*calc_sun(norm_w);}
+float3 	calc_model_hemi 	(float norm_y)	{return (norm_y*0.5+0.5)*L_dynamic_props.w*L_hemi_color;}
+float3	calc_model_lq_lighting	(float3 norm_w){return calc_model_hemi(norm_w.y)+L_ambient+L_dynamic_props.xyz*calc_sun(norm_w);}
+float3	_calc_model_lq_lighting	(float3 norm_w){return calc_model_hemi(norm_w.y)+L_ambient+.5*calc_sun(norm_w);}
 float4 	calc_model_lmap 	(float3 pos_w)	{
 	float3  pos_wc=clamp		(pos_w,m_plmap_clamp[0],m_plmap_clamp[1]);//clamp to BBox
 	float4 	pos_w4c=float4	(pos_wc,1);
@@ -111,8 +110,7 @@ uniform sampler2D 	s_detail;
 
 #define def_distort	half(0.05f)	//we get-0.5 .. 0.5 range,this is-512 .. 512 for 1024,so scale it
 
-float3	v_hemi 		(float3 n)		{return L_hemi_color/**(.5f+.5f*n.y)*/;}
-float3	v_hemi_wrap	(float3 n,float w)	{return L_hemi_color/**(w+(1-w)*n.y)*/;}
+float3	v_hemi 		()		{return L_hemi_color;}
 float3 	v_sun 		(float3 n)		{return L_sun_color*max(0,dot(n,-L_sun_dir_w));}
 float3 	v_sun_wrap	(float3 n,float w)	{return L_sun_color*(w+(1-w)*dot(n,-L_sun_dir_w));}
 half3	p_hemi		(float2 tc)	{

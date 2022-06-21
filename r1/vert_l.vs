@@ -10,9 +10,9 @@ vf main (v_vert v)
 {
 	vf 		o;
 
-	float3 	N=unpack_normal		(v.N);
+	float3 	N=unpack_bx2		(v.N);
 	float3 	L_rgb=v.color.xyz;//precalculated RGB lighting
-	float3 	L_hemi=v_hemi(N)*v.N.w;//hemisphere
+	float3 	L_hemi=v_hemi()*v.N.w;//hemisphere
 	float 	L_sun=v.color.w;//sun occl only
 	float3 	L_final=L_rgb+L_hemi+L_ambient;
 

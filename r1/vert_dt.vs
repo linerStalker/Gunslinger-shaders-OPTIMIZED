@@ -14,14 +14,13 @@ vf main (v_vert v)
 {
 	vf 		o;
 
-	float3 	N=unpack_normal		(v.N);
+	float3 	N=unpack_bx2		(v.N);
 	o.hpos=mul			(m_VP,v.P);//xform,input in world coords
-	o.tc0=unpack_tc_base	(v.uv,v.T.w,v.B.w);//copy tc
-//	o.tc0=unpack_tc_base	(v.tc);//copy tc
+	o.tc0=unpack_tc_base	(v.uv.xy,v.T.w,v.B.w);
 	o.tc1=o.tc0*dt_params;//dt tc
 
 	float3 	L_rgb=v.color.xyz;//precalculated RGB lighting
-	float3 	L_hemi=v_hemi(N)*v.N.w;//hemisphere
+	float3 	L_hemi=v_hemi()*v.N.w;//hemisphere
 	float3 	L_sun=v_sun(N)*v.color.w;//sun
 	float3 	L_final=L_rgb+L_hemi+L_sun+L_ambient;
 

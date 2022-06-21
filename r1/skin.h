@@ -57,7 +57,7 @@ float4 	u_position	(float4 v)	{return float4(v.xyz*(12.f/32768.f),1.f);}	//-12..
 uniform float4 	sbones_array	[255-22-3]:register(vs,c22);
 float3 	skinning_dir 	(float3 dir,float3 m0,float3 m1,float3 m2)
 {
-	float3 	U=unpack_normal(dir);
+	float3 	U=unpack_bx2(dir);
 	return 	float3	
 		(
 			dot	(m0,U),
@@ -82,9 +82,9 @@ v_model skinning_0	(v_model_skinned_0	v)
 	//skinning
 	v_model 	o;
 	o.pos=u_position(v.P);
-	o.norm=unpack_normal(v.N);
-	o.T=unpack_normal(v.T);
-	o.B=unpack_normal(v.B);
+	o.norm=unpack_bx2(v.N);
+	o.T=unpack_bx2(v.T);
+	o.B=unpack_bx2(v.B);
 	o.tc=v.tc		*(16.f/32768.f);//-16..+16
 #ifdef SKIN_COLOR
 	o.rgb_tint=float3	(0,0,2);

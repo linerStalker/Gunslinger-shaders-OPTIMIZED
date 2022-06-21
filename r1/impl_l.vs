@@ -14,9 +14,9 @@ vf main (v_lmap v)
 
 	
 	o.hpos=mul			(m_VP,v.P);//xform,input in world coords
-	o.tc0=unpack_tc_base	(v.uv0,v.T.w,v.B.w);//copy tc
+	o.tc0=unpack_tc_base	(v.uv0.xy,v.T.w,v.B.w);//copy tc
 	o.tc1=o.tc0;//copy tc 
-	o.c0=v_hemi(unpack_normal(v.N));//just ambient
+	o.c0=v_hemi();//just ambient
 
 	return o;
 }

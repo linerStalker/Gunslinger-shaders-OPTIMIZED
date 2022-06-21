@@ -16,11 +16,11 @@ vf main (v_vert v)
 	vf 		o;
 
 	float4 	P=v.P;
-	float3 	N=unpack_normal	(v.N);
+	float3 	N=unpack_bx2	(v.N);
 		
 		P=watermove	(P);
 
-	float2 	tc_base=unpack_tc_base	(v.uv,v.T.w,v.B.w);//copy tc
+	float2 	tc_base=unpack_tc_base	(v.uv.xy,v.T.w,v.B.w);//copy tc
 
 	float 	amount;
 	float3 	tc_refl=waterrefl 		(amount,P,N);
@@ -29,7 +29,7 @@ vf main (v_vert v)
 	o.tenv=tc_refl;
 
 	float3 	L_rgb=v.color.xyz;//precalculated RGB lighting
-	float3 	L_hemi=v_hemi(N)*v.N.w;//hemisphere
+	float3 	L_hemi=v_hemi()*v.N.w;//hemisphere
 	float3 	L_sun=v_sun(N)*v.color.w;//sun
 	float3 	L_final=L_rgb+L_hemi+L_sun+L_ambient;
 
