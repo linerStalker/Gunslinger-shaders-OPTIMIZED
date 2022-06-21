@@ -1,0 +1,39 @@
+#include "common.h"
+
+struct 	v2p
+{
+ 	half4 	tc0:		TEXCOORD0;//base
+ 	half4 	tc1:		TEXCOORD1;//environment
+  	half4	c0:			COLOR0;//sun.(fog*fog)
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+half4 	main_ps_1_4	(v2p I)	:COLOR
+{
+	half2 coords=I.tc0;
+	half2 coords_new;
+
+
+
+	//Rotate texture
+	half sin_a=m_timearrow.z;
+	half cos_a=m_timearrow.a;
+	coords.x=coords.x-0.5;
+	coords.y=coords.y-0.5;
+
+	coords_new.x=coords.x*cos_a+coords.y*sin_a;
+	coords_new.y=-coords.x*sin_a+coords.y*cos_a;
+
+	coords_new.x=coords_new.x+0.5;
+	coords_new.y=coords_new.y+0.5;
+
+
+	half4	t_base=tex2D	(s_base,coords_new);
+
+	//получаем пиксель шума и масштабируем его в соответствии с текущим уровнем проблем
+	half4 t_noise=tex2D(s_lmap,I.tc0)*m_affects.x*2;
+	t_base.rgb+=t_noise.rgb;
+
+	return  t_base;
+}
