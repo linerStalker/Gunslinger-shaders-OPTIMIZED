@@ -11,7 +11,7 @@ v2p_bumped main(v_in I)
 {
 //	I.color.rgb=I.color.bgr;//	Swizzle to compensate DX9/DX10 format mismatch
 	float4	w_pos=I.P;
-	float2 	tc=unpack_tc_base	(I.tc,I.T.w,I.B.w);//copy tc
+	float2 	tc=unpack_tc_base	(I.tc.xy,I.T.w,I.B.w);//copy tc
 	float 	hemi=I.Nh.w;
 
 	//Eye-space pos/normal

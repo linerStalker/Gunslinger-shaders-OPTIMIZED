@@ -15,27 +15,13 @@ float Contrast(float Input,float ContrastPower)
 void tonemap(out float4 low,out float4 high,float3 rgb,float scale)
 {
 	rgb=rgb*scale;
-
-	const float fWhiteIntensity=1.7;
-
-	const float fWhiteIntensitySQR=fWhiteIntensity*fWhiteIntensity;
-
-//	low=(rgb/(rgb+1)).xyzz;
-	low=((rgb*(1+rgb/fWhiteIntensitySQR))/ (rgb+1)).xyzz;
-
-	high=rgb.xyzz/def_hdr;//8x dynamic range
-
-/*
-	rgb=rgb*scale;
-
-	low=rgb.xyzz;
-	high=low/def_hdr;//8x dynamic range
-*/
+	low=((rgb*(1+rgb/2.89))/ (rgb+1)).xyzz;
+	high=rgb.xyzz/def_hdr;
 }
 
 float4 combine_bloom(float3  low,float4 high)	
 {
-        return float4(low+high*high.a,1.h);
+    return float4(low+high*high.a,1.h);
 }
 
 float calc_fogging(float4 w_pos)
@@ -43,9 +29,9 @@ float calc_fogging(float4 w_pos)
 	return dot(w_pos,fog_plane);
 }
 
-float2 unpack_tc_base(float2 tc,float du,float dv)
+float2 unpack_tc_base(float2 xy,float du,float dv)
 {
-		return (tc.xy+float2	(du,dv))*(32.f/32768.f);//!Increase from 32bit to 64bit floating point
+	return (xy+float2(du,dv))*(32.f/32768.f);
 }
 
 float3 calc_sun_r1(float3 norm_w)
@@ -53,17 +39,16 @@ float3 calc_sun_r1(float3 norm_w)
 	return L_sun_color*saturate(dot((norm_w),-L_sun_dir_w));        
 }
 
-float3 calc_model_hemi_r1(float3 norm_w)
+float3 calc_model_hemi_r1(float norm_y)
 {
- return max(0,norm_w.y)*L_hemi_color;
+ return max(0,norm_y)*L_hemi_color;
 }
 
 float3 calc_model_lq_lighting(float3 norm_w)
 {
-	return L_material.x*calc_model_hemi_r1(norm_w)+L_ambient+L_material.y*calc_sun_r1(norm_w);
+	return L_material.x*calc_model_hemi_r1(norm_w.y)+L_ambient+L_material.y*calc_sun_r1(norm_w);
 }
 
-float3 	unpack_normal(float3 v)	{return 2*v-1;}
 float3 	unpack_bx2(float3 v)	{return 2*v-1;}
 float3 	unpack_bx4(float3 v)	{return 4*v-2;} //!reduce the amount of stretching from 4*v-2 and increase precision
 float2 	unpack_tc_lmap(float2 tc)	{return tc*(1.f/32768.f);} //[-1  ..+1] 
@@ -80,19 +65,9 @@ float3   p_hemi(float2 tc)
 	return	t_lmh.a;
 }
 
-float   get_hemi(float4 lmh)
+float3	v_hemi(float y)
 {
-	return lmh.a;
-}
-
-float   get_sun(float4 lmh)
-{
-	return lmh.g;
-}
-
-float3	v_hemi(float3 n)
-{
-	return L_hemi_color*(.5f+.5f*n.y);          
+	return L_hemi_color*(.5f+.5f*y);          
 }
 
 float3	v_sun(float3 n)               	
@@ -122,28 +97,6 @@ float3	calc_reflection(float3 pos_w,float3 norm_w)
 #define USABLE_BIT_15               uint(0x80000000)
 #define MUST_BE_SET                 uint(0x40000000)//This flag*must*be stored in the floating-point representation of the bit flag to store
 
-/*
-float2 gbuf_pack_normal(float3 norm)
-{
-   float2 res;
-
-   res=0.5*(norm.xy+float2(1,1));
-   res.x*=(norm.z<0?-1.0:1.0);
-
-   return res;
-}
-
-float3 gbuf_unpack_normal(float2 norm)
-{
-   float3 res;
-
-   res.xy=(2.0*abs(norm))-float2(1,1);
-
-   res.z=(norm.x<0?-1.0:1.0)*sqrt(abs(1-res.x*res.x-res.y*res.y));
-
-   return res;
-}
-*/
 
 //Holger Gruen AMD-I change normal packing and unpacking to make sure N.z is accessible without ALU cost
 //this help the HDAO compute shader to run more efficiently
@@ -172,7 +125,6 @@ float3 gbuf_unpack_normal(float2 norm)
 float gbuf_pack_hemi_mtl(float hemi,float mtl)
 {
    uint packed_mtl=uint((mtl/1.333333333)*31.0);
-//uint packed=(MUST_BE_SET+(uint(hemi*255.0)<<13)+((packed_mtl & uint(31))<<21));
 	//	Clamp hemi max value
 	uint packed=(MUST_BE_SET+(uint(saturate(hemi)*255.9)<<13)+((packed_mtl & uint(31))<<21));
 
@@ -187,31 +139,30 @@ float gbuf_pack_hemi_mtl(float hemi,float mtl)
 
 float gbuf_unpack_hemi(float mtl_hemi)
 {
-//return float((asuint(mtl_hemi)>>13)& uint(255))*(1.0/255.0);
 	return float((asuint(mtl_hemi)>>13)& uint(255))*(1.0/254.8);
 }
 
 float gbuf_unpack_mtl(float mtl_hemi)
 {
-   uint packed =asuint(mtl_hemi);
+   uint packed=asuint(mtl_hemi);
    uint packed_hemi=((packed>>21)& uint(15))+((packed & USABLE_BIT_15)==0?0:16);
    return float(packed_hemi)*(1.0/31.0)*1.333333333;
 }
 
-#ifndef EXTEND_F_DEFFER
-f_deffer pack_gbuffer(float4 norm,float4 pos,float4 col)
-#else
+#ifdef EXTEND_F_DEFFER
 f_deffer pack_gbuffer(float4 norm,float4 pos,float4 col,uint imask)
+#else
+f_deffer pack_gbuffer(float4 norm,float4 pos,float4 col)
 #endif
 {
 	f_deffer res;
 
-#ifndef GBUFFER_OPTIMIZATION
-	res.position=pos;
-	res.Ne=norm;
+#ifdef GBUFFER_OPTIMIZATION
+	res.position=float4(gbuf_pack_normal(norm),pos.z,gbuf_pack_hemi_mtl(norm.w,pos.w));
 	res.C			=col;
 #else
-	res.position=float4(gbuf_pack_normal(norm),pos.z,gbuf_pack_hemi_mtl(norm.w,pos.w));
+	res.position=pos;
+	res.Ne=norm;
 	res.C			=col;
 #endif
 
@@ -233,10 +184,10 @@ gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD,float2 pos2d,int iSample)
 	gbd.C=0;
 	gbd.N=float3(0,0,0);
 
-#ifndef USE_MSAA
-	float4 P=s_position.Sample(smp_nofilter,tc);
-#else
+#ifdef USE_MSAA
 	float4 P=s_position.Load(int3(pos2d,0),iSample);
+#else
+	float4 P=s_position.Sample(smp_nofilter,tc);
 #endif
 
 	//3d view space pos reconstruction math
@@ -258,10 +209,10 @@ gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD,float2 pos2d,int iSample)
    //reconstruct hemi
    gbd.hemi=gbuf_unpack_hemi(P.w);
 
-#ifndef USE_MSAA
-   float4	C=s_diffuse.Sample(smp_nofilter,tc);
+#ifdef USE_MSAA
+   float4 C=s_diffuse.Load(int3(pos2d,0),iSample);
 #else
-   float4	C=s_diffuse.Load(int3(pos2d,0),iSample);
+   float4 C=s_diffuse.Sample(smp_nofilter,tc);
 #endif
 
 	gbd.C=C.xyz;
@@ -294,28 +245,28 @@ gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD,uint iSample)
 {
 	gbuffer_data gbd;
 
-#ifndef USE_MSAA
-	float4 P=s_position.Sample(smp_nofilter,tc);
+#ifdef USE_MSAA
+	float4 P=s_position.Load(int3(tc*pos_decompression_params2.xy,0),iSample);
 #else
-   float4 P=s_position.Load(int3(tc*pos_decompression_params2.xy,0),iSample);
+	float4 P=s_position.Sample(smp_nofilter,tc);
 #endif
 
 	gbd.P=P.xyz;
 	gbd.mtl=P.w;
 
-#ifndef USE_MSAA
-	float4 N=s_normal.Sample(smp_nofilter,tc);
-#else
+#ifdef USE_MSAA
 	float4 N=s_normal.Load(int3(tc*pos_decompression_params2.xy,0),iSample);
+#else
+	float4 N=s_normal.Sample(smp_nofilter,tc);
 #endif
 
 	gbd.N=N.xyz;
 	gbd.hemi=N.w;
 
-#ifndef USE_MSAA
-	float4	C=s_diffuse.Sample(smp_nofilter,tc);
+#ifdef USE_MSAA
+	float4 C=s_diffuse.Load(int3(tc*pos_decompression_params2.xy,0),iSample);
 #else
-	float4	C=s_diffuse.Load(int3(tc*pos_decompression_params2.xy,0),iSample);
+	float4 C=s_diffuse.Sample(smp_nofilter,tc);
 #endif
 
 
@@ -325,90 +276,71 @@ gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD,uint iSample)
 	return gbd;
 }
 
-gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD)
-{
-   return gbuffer_load_data(tc,0);
-}
-
-gbuffer_data gbuffer_load_data_offset(float2 tc:TEXCOORD,float2 OffsetTC:TEXCOORD,uint iSample)
+gbuffer_data gbuffer_load_data_offset(float2 OffsetTC:TEXCOORD,uint iSample)
 {
    return gbuffer_load_data(OffsetTC,iSample);
 }
 
 #endif //GBUFFER_OPTIMIZATION
 
-//////////////////////////////////////////////////////////////////////////
-//	Aplha to coverage code
 #if (defined(MSAA_ALPHATEST_DX10_1_ATOC)|| defined(MSAA_ALPHATEST_DX10_1))
 
 #if MSAA_SAMPLES==2
-uint alpha_to_coverage (float alpha,float2 pos2d)
+uint alpha_to_coverage (float alpha,uint mask)
 {
-	uint mask;
-	uint pos=uint(pos2d.x)| uint(pos2d.y);
 	if(alpha<0.3333)
-		mask=0;
+		return 0;
 	else if(alpha<0.6666)
-		mask=1<<(pos & 1);
+		return 1<<(mask & 1);
 	else 
-		mask=3;
-
-	return mask;
+		return 3;
 }
 #endif
 
 #if MSAA_SAMPLES==4
-uint alpha_to_coverage (float alpha,float2 pos2d)
+uint alpha_to_coverage (float alpha,uint mask)
 {
-	uint mask;
-
-	float off=float((uint(pos2d.x)| uint(pos2d.y))& 3);
+	float off=float(mask)& 3);
 	alpha=saturate(alpha-off*((0.2/4.0)/ 3.0));
 	if(alpha<0.40)
 	{
 		if(alpha<0.20)
-			mask=0;
-		else if(alpha<0.40)//only one bit set
-			mask=1;
-}
-  else
-  {
-	if(alpha<0.60)//2 bits set=>1100 0110 0011 1001 1010 0101
-	{
-		mask=3;
-}
-	else if(alpha<0.8)//3 bits set=>1110 0111 1011 1101 
-	  mask=7;
-	else
-	  mask=0xf;
-}
-
-	return mask;
+			return 0;
+		else if(alpha<0.40)
+			return 1;
+	}
+    else
+    {
+		if(alpha<0.60)
+			return 3;
+		else if(alpha<0.8)
+		  return 7;
+		else
+		  return 0xf;
+	}
 }
 #endif
 
 #if MSAA_SAMPLES==8
-uint alpha_to_coverage (float alpha,float2 pos2d)
+uint alpha_to_coverage (float alpha,uint mask)
 {
-	uint mask;
-
-	float off=float((uint(pos2d.x)| uint(pos2d.y))& 3);
+	float off=float(mask)& 3);
 	alpha=saturate(alpha-off*((0.1111/8.0)/ 3.0));
   if(alpha<0.4444)
   {
 	if(alpha<0.2222)
 	{
 		if(alpha<0.1111)
-			mask=0;
+			return 0;
 		else //only one bit set 0.2222
-			mask=1;
+			return 1;
 	}
 	else 
 	{
 		if(alpha<0.3333)
-			mask=3;
+			return 3;
 	    else
-			mask=0x7;
+			return 0x7;
 	}
   }
   else
@@ -416,22 +348,20 @@ uint alpha_to_coverage (float alpha,float2 pos2d)
 	  if(alpha<0.6666)
 	  {
 		if(alpha<0.5555)
-			mask=0xf;
+			return 0xf;
 		else
-			mask=0x1F;
+			return 0x1F;
 	}
 	  else
 	  {
 		if(alpha<0.7777)
-			mask=0x3F;
+			return 0x3F;
 		else if(alpha<0.8888)
-			mask=0x7F;
+			return 0x7F;
 		else
-			mask=0xFF;
+			return 0xFF;
 	}
 }
-
-	return mask;
 }
 #endif
 #endif

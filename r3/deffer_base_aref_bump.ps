@@ -32,7 +32,7 @@ f_deffer 	main	(p_bumped I)
 #endif	//	!(defined(MSAA_ALPHATEST_DX10_1_ATOC)|| defined(MSAA_ALPHATEST_DX10_1_ATOC))
 #ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
 	float alpha=(S.base.w-def_aref*0.5f)/(1-def_aref*0.5f);
-	uint mask=alpha_to_coverage (alpha,pos2d);
+	uint mask=alpha_to_coverage (alpha,uint(pos2d.x)| uint(pos2d.y));
 #endif	//	MSAA_ALPHATEST_DX10_1_ATOC
 
 #else	//	!defined(MSAA_ALPHATEST_DX10_1)
@@ -62,10 +62,10 @@ f_deffer 	main	(p_bumped I)
 //	float4	lm=tex2D			(s_hemi,I.lmh);
 	float4	lm=s_hemi.Sample(smp_rtlinear,I.lmh);
 	//float 	h=dot			(lm.rgb,1.h/3.h);
-	float 	h=get_hemi(lm);
+	float 	h=lm.a;
 # ifdef USE_R2_STATIC_SUN
 //		 	ms=lm.w;
-			ms=get_sun(lm);
+			ms=lm.g;
 # endif
 #else
 	float 	h=I.position.w;

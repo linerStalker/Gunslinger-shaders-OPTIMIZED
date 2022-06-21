@@ -40,7 +40,7 @@ float4 main(v2p I):SV_Target
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbd=gbuffer_load_data(PosTc,I.hpos);
 #else
-	gbuffer_data gbd=gbuffer_load_data(PosTc);
+	gbuffer_data gbd=gbuffer_load_data(PosTc,0);
 #endif
 	//float4 _P=s_position.Sample(smp_nofilter,PosTc);
 	float4 _P=float4(gbd.P,gbd.mtl);

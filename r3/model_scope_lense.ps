@@ -28,7 +28,7 @@ Texture2D 	s_vp2;
 
 float random(float2 co)
 {
-      return 0.5+(frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
+      return 0.5+get_noise(co);
 };
 
 float4 main(v2p I):SV_Target

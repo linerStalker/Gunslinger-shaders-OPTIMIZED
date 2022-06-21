@@ -3,11 +3,6 @@
 
 uniform	float4 		m_affects;
 
-float get_noise(float2 co)
-{
-	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
-};
-
 f_deffer main(p_flat I)
 {
   f_deffer	O;
@@ -26,10 +21,10 @@ f_deffer main(p_flat I)
 //	float4	lm=tex2D(s_hemi,I.lmh);
 	float4	lm=s_hemi.Sample(smp_rtlinear,I.lmh);
 //	float 	h=dot(lm.rgb,1.h/3.h);
-	float 	h=get_hemi(lm);
+	float 	h=lm.a;
 # ifdef USE_R2_STATIC_SUN
 //		 	ms=lm.w;
-			ms=get_sun(lm);
+			ms=lm.g;
 # endif
 #else
 	float 	h=I.position.w;

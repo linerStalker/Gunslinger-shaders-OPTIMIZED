@@ -86,7 +86,7 @@ float4 main(vf I):SV_Target
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbd=gbuffer_load_data(PosTc,pos2d);
 #else
-	gbuffer_data gbd=gbuffer_load_data(PosTc);
+	gbuffer_data gbd=gbuffer_load_data(PosTc,0);
 #endif
 	float4 _P=float4(gbd.P,gbd.mtl);
 	float waterDepth=_P.z-I.tctexgen.z;

@@ -72,7 +72,7 @@ c2_out main(v2p_aa_AA I)
 #ifdef GBUFFER_OPTIMIZATION
 	gbuffer_data gbdx=gbuffer_load_data_offset(I.Tex0,center,I.HPos,iSample);
 #else
-	gbuffer_data gbdx=gbuffer_load_data_offset(I.Tex0,center,iSample);
+	gbuffer_data gbdx=gbuffer_load_data_offset(center,iSample);
 #endif
 
 //	float 	depth_x=tex2D 	(s_position,center).z;

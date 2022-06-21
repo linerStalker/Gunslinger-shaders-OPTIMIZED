@@ -44,11 +44,11 @@ vf main (v_vert v)
         vf                 o;
 
         float4         P   =v.P;       //world
-        float3         NN   =unpack_normal        (v.N);
+        float3         NN   =unpack_bx2        (v.N);
                 P   =watermove        (P);
 
         o.v2point  =P-eye_position;
-        o.tbase          =unpack_tc_base        (v.uv,v.T.w,v.B.w);       //copy tc
+        o.tbase   =unpack_tc_base        (v.uv.xy,v.T.w,v.B.w);       //copy tc
         o.tnorm0  =watermove_tc                 (o.tbase*W_DISTORT_BASE_TILE_0,P.xz,W_DISTORT_AMP_0);
         o.tnorm1  =watermove_tc                 (o.tbase*W_DISTORT_BASE_TILE_1,P.xz,W_DISTORT_AMP_1);
 
@@ -79,7 +79,7 @@ vf main (v_vert v)
         o.M3=xform        [2];
 
         float3         L_rgb   =v.color.xyz;                                       //precalculated RGB lighting
-        float3         L_hemi   =v_hemi(N)*v.N.w;                               //hemisphere
+        float3         L_hemi   =v_hemi(N.y)*v.N.w;                               //hemisphere
         float3         L_sun   =v_sun(N)*v.color.w;                               //sun
         float3         L_final  =L_rgb+L_hemi+L_sun+L_ambient;
                 //L_final  =v.N.w     +L_ambient;

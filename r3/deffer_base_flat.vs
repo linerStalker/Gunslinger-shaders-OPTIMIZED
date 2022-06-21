@@ -20,7 +20,7 @@ v2p_flat main (v_in I)
 	O.N=mul((float3x3)m_WV,unpack_bx2(I.Nh));
 	float3	Pe=mul(m_WV,I.P);
 
-	float2	tc=unpack_tc_base(I.tc,I.T.w,I.B.w);//copy tc
+	float2	tc=unpack_tc_base(I.tc.xy,I.T.w,I.B.w);//copy tc
 	O.tcdh=float4(tc.xyyy);
 	O.position=float4(Pe,I.Nh.w);
 

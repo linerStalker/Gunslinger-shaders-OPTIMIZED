@@ -67,7 +67,7 @@ f_deffer 	main	(vf I)
 #endif	//	!(defined(MSAA_ALPHATEST_DX10_1_ATOC)|| defined(MSAA_ALPHATEST_DX10_1_ATOC))
 #ifdef 	MSAA_ALPHATEST_DX10_1_ATOC
 	float alpha=(D.w-(96.h/255.h)*0.5)/(1-(96.h/255.h)*0.5);
-	uint mask=alpha_to_coverage (alpha,pos2d);
+	uint mask=alpha_to_coverage (alpha,uint(pos2d.x)| uint(pos2d.y));
 #endif	//	MSAA_ALPHATEST_DX10_1_ATOC
 
 #else

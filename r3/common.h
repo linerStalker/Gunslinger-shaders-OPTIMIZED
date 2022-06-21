@@ -19,6 +19,11 @@
 #  define xmaterial float(L_material.w)
 #endif
 
+float get_noise(float2 co)
+{
+	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
+}
+
 #define FXPS technique _render{pass _code{PixelShader=compile ps_3_0 main();}}
 #define FXVS technique _render{pass _code{VertexShader=compile vs_3_0 main();}}
 

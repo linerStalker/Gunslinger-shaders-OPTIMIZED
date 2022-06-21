@@ -187,7 +187,7 @@ float	calc_ssao(float3 P,float3 N,float2 tc,float2 tcJ,uint iSample)
 #ifdef GBUFFER_OPTIMIZATION
 		gbuffer_data gbd=gbuffer_load_data_offset(tc,tap,pos2d);//this is wrong-need to correct this
 #else
-		gbuffer_data gbd=gbuffer_load_data(tap);
+		gbuffer_data gbd=gbuffer_load_data(tap,0);
 #endif
 #endif
 
