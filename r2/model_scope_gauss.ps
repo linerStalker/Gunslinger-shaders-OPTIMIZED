@@ -20,16 +20,11 @@ float  resize(float input,float factor,float offset)
 	return (input-0.5f+offset)/ factor+0.5f-offset;
 }
 
-half get_noise(float2 co)
-{
-	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
-};
-
 uniform sampler2D	s_vp2;
 
 float random(float2 co)
 {
-      return 0.5+(frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
+      return 0.5+get_noise(co);
 };
 
 half4 	main	(v2p I)	:COLOR

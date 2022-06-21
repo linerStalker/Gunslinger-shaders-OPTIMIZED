@@ -3,7 +3,7 @@
 p_bumped	main	(v_static I)
 {
 	float4	w_pos=I.P;
-	float2 	tc=unpack_tc_base	(I.tc,I.T.w,I.B.w);//copy tc
+	float2 	tc=unpack_tc_base	(I.tc.xy,I.T.w,I.B.w);//copy tc
 	float 	hemi=I.Nh.w;
 
 	//Eye-space pos/normal

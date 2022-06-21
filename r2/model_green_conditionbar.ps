@@ -11,11 +11,6 @@ struct 	v2p
 uniform	float4 		m_actor_params;
 uniform	float4 		m_affects;
 
-half get_noise(float2 co)
-{
-	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
-};
-
 half4 	main	(v2p I)	:COLOR
 {
 	half4	t_base=tex2D		(s_base,I.tc0);

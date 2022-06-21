@@ -69,9 +69,9 @@ float3         calc_reflection     (float3 pos_w,float3 norm_w)
     return reflect(normalize(pos_w-eye_position),norm_w);
 }
 
-float3        calc_sun_r1                (float3 norm_w){return L_sun_color*saturate(dot((norm_w),-L_sun_dir_w));   }
-float3        calc_model_hemi_r1         (float3 norm_w){return max(0,norm_w.y)*L_hemi_color;                           }
-float3        calc_model_lq_lighting     (float3 norm_w){return L_material.x*calc_model_hemi_r1(norm_w)+L_ambient+L_material.y*calc_sun_r1(norm_w);}
+float3        calc_sun_r1                (float3 norm_w){return L_sun_color*saturate(dot((norm_w),-L_sun_dir_w));}
+float3        calc_model_hemi_r1         (float norm_y){return max(0,norm_y)*L_hemi_color;}
+float3        calc_model_lq_lighting     (float3 norm_w){return L_material.x*calc_model_hemi_r1(norm_w.y)+L_ambient+L_material.y*calc_sun_r1(norm_w);}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 struct         v_static                {
@@ -256,40 +256,20 @@ void        tonemap              (out half4 low,out half4 high,half3 rgb,half sc
         high=   half4       	(rgb/def_hdr,0);//8x dynamic range
 #endif
 
-/*
-	rgb=rgb*scale;
-
-	low=rgb.xyzz;
-	high=low/def_hdr;//8x dynamic range
-*/
-
-//		low=half4	(rgb,0);
-//		rgb	/=def_hdr;
-//		high=half4	(rgb,dot(rgb,0.333f)-def_hdr_clip);
 }
-half4		combine_bloom        (half3  low,half4 high)	{
-        return        half4(low+high*high.a,1.h);
+half4 combine_bloom (half3  low,half4 high)
+{
+	return half4(low+high*high.a,1.h);
 }
 
-float3	v_hemi        	(float3 n)               	{      return L_hemi_color*(.5f+.5f*n.y);     }
-float3	v_hemi_wrap     (float3 n,float w)       	{      return L_hemi_color*(w+(1-w)*n.y);     }
-float3	v_sun           (float3 n)               	{      return L_sun_color*dot(n,-L_sun_dir_w);  }
-float3	v_sun_wrap      (float3 n,float w)       	{      return L_sun_color*(w+(1-w)*dot(n,-L_sun_dir_w));}
+float3	v_hemi        	(float y)               	{return L_hemi_color*(.5f+.5f*y);}
+float3	v_sun           (float3 n)               	{return L_sun_color*dot(n,-L_sun_dir_w);}
+float3	v_sun_wrap      (float3 n,float w)       	{return L_sun_color*(w+(1-w)*dot(n,-L_sun_dir_w));}
 half3   p_hemi          (float2 tc)                {
 //    half3        	t_lmh   =tex2D             	(s_hemi,tc);
 //    return  dot     (t_lmh,1.h/4.h);
         half4        	t_lmh   =tex2D             	(s_hemi,tc);
         return t_lmh.a;
-}
-
-half   get_hemi(half4 lmh)
-{
-	return lmh.a;
-}
-
-half   get_sun(half4 lmh)
-{
-	return lmh.g;
 }
 
 //	contrast function
@@ -301,6 +281,11 @@ half Contrast(half Input,half ContrastPower)
      half Output=0.5*pow(ToRaise,ContrastPower);
      Output=IsAboveHalf?1-Output:Output;
      return Output;
+}
+
+half get_noise(float2 co)
+{
+	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
 }
 
 #define FXPS technique _render{pass _code{PixelShader=compile ps_3_0 main();}}

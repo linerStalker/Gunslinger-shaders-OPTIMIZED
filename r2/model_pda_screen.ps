@@ -11,11 +11,6 @@ uniform sampler2D	s_vp2;
 uniform sampler2D	s_load;
 uniform	float4 		m_affects;
 
-half get_noise(float2 co)
-{
-	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
-};
-
 half4 problems_main(v2p I)
 {
 	
@@ -55,4 +50,3 @@ half4 	main	(v2p I)	:COLOR
 {
 	return (m_affects.a>0 && m_affects.x>=0.08)?loading_main(I):problems_main(I);
 }
-

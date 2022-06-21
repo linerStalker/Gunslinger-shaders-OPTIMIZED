@@ -17,10 +17,10 @@ f_deffer 	main	(p_flat I)
 #ifdef USE_LM_HEMI
 	half4	lm=tex2D			(s_hemi,I.lmh);
 //	half 	h=dot			(lm.rgb,1.h/3.h);
-	half 	h=get_hemi(lm);
+	half 	h=lm.a;
 # ifdef USE_R2_STATIC_SUN
 //		 	ms=lm.w;
-			ms=get_sun(lm);
+			ms=lm.g;
 # endif
 #else
 	half 	h=I.position.w;
