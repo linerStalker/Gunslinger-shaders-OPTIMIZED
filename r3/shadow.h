@@ -98,13 +98,15 @@ static const float W0[11][11]=
 			       {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
 			       {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
 			  };
+
 typedef unsigned char u8;
 float Fw(u8 r,u8 c,float fL)
 {
-	return        (1.0-fL)*(1.0-fL)*(1.0-fL)*W0[r][c]+
-	       3.0f*(1.0-fL)*(1.0-fL)*fL    *W1[r][c]+
-	       3.0f* fL   * fL   *(1.0-fL)*W2[r][c]+
-                     fL   * fL   *fL;
+	float CA = (1.0-fL);
+	return CA*CA*CA*W0[r][c]+
+	       3.0f*CA*CA*fL*W1[r][c]+
+	       3.0f*fL*fL*CA*W2[r][c]+
+                     fL*fL*fL;
 } 
 
 #define BLOCKER_FILTER_SIZE	11
@@ -119,9 +121,8 @@ float shadow_extreme_quality(float3 tc)
    float  s=0.0f, w=0.0f, avgBlockerDepth=0.0f, blockerCount=0.0f, fRatio;
    float2 stc=(SMAP_size*tc.xy)+float2(0.5,0.5);
    float2 tcs=floor(stc);
-   int    row,col;
-   float4 v1[FS2+1];
    float2 v0[FS2+1];
+   float4 v1[FS2+1];
 
    float2 fc=stc-tcs;
    tc.xy=tc.xy-((1.0f/SMAP_size)*fc);
@@ -129,9 +130,9 @@ float shadow_extreme_quality(float3 tc)
 
 #if defined(SM_4_1)|| defined(SM_5)
     //find number of blockers and sum up blocker depth
-    for(row=-BFS2;row<=BFS2;row+=2)
+    for(int row=-BFS2;row<=BFS2;row+=2)
     {
-        for(col=-BFS2;col<=BFS2;col+=2)
+        for(int col=-BFS2;col<=BFS2;col+=2)
         {
             float4 d4=s_smap.Gather(smp_nofilter,tc.xy,int2(col,row));
             float4 b4=(tc.zzzz<=d4)?(0.0f).xxxx:(1.0f).xxxx;
@@ -143,10 +144,10 @@ float shadow_extreme_quality(float3 tc)
 #else //SM_4_0
 	uint vmask[FS+1];
 
-    [unroll]for(col=0;col<=FS;++col)
+    [unroll]for(u8 col=0;col<=FS;++col)
 		vmask[col]=uint(0);
 	
-	[unroll(11)]for(row=-FS2;row<=FS2;row+=2)
+	[unroll(11)]for(int row=-FS2;row<=FS2;row+=2)
     {
        [unroll]for(int col=-FS2;col<=FS2;col+=2)
         {
@@ -189,14 +190,14 @@ float shadow_extreme_quality(float3 tc)
    else
 	   fRatio=0.0;
 
-   for(row=0;row<FS;++row)
+   for(u8 row=0;row<FS;++row)
    {
-      for(col=0;col<FS;++col)
+      for(u8 col=0;col<FS;++col)
          w+=Fw(row,col,fRatio);
 	}
 
     //filter shadow map samples using the dynamic weights
-    [unroll(11)]for(row=-FS2;row<=FS2;row+=2)
+    [unroll(11)]for(int row=-FS2;row<=FS2;row+=2)
     {
         [unroll]for(int col=-FS2;col<=FS2;col+=2)
         {
@@ -276,7 +277,6 @@ float shadow_extreme_quality_fused(float3 tc)
     float4 s=(0.0f).xxxx;
     float2 stc=(SMAP_size*tc.xy)+float2(0.5,0.5);
     float2 tcs=floor(stc);
-    int    row, col;
     float  w=0.0,avgBlockerDepth=0.0,blockerCount=0.0,fRatio;
     float4 v1[FS2+1];
     float2 v0[FS2+1];
@@ -286,9 +286,9 @@ float shadow_extreme_quality_fused(float3 tc)
     tc.xy=tc.xy-(fc*ZN);
 
     //filter shadow map samples using the dynamic weights
-    [unroll(FS)]for(row=-FS2;row<=FS2;row+=2)
+    [unroll(FS)]for(int row=-FS2;row<=FS2;row+=2)
     {
-        for(col=-FS2;col<=FS2;col+=2)
+        for(int col=-FS2;col<=FS2;col+=2)
         {
 			int X = (col+FS2)/2;
 			{
@@ -413,20 +413,21 @@ float shadow_extreme_quality_fused(float3 tc)
         avgBlockerDepth/=blockerCount;
         fRatio=saturate(((tc.z-avgBlockerDepth)*SUN_WIDTH)/ avgBlockerDepth);
         fRatio*=fRatio;
-}
+	}
     else
         fRatio=0.0;
 
     //sum up weights of dynamic filter matrix
-    for(row=0;row<FS;++row)
+    for(u8 row=0;row<FS;++row)
     {
-       for(col=0;col<FS;++col)
+       for(u8 col=0;col<FS;++col)
           w+=Fw(row,col,fRatio);
-}
+	}
 
-    return dot(s,float4((1.0f-fRatio)*(1.0f-fRatio)*(1.0f-fRatio),
-						 3.0f*(1.0-fRatio)*(1.0-fRatio)*fRatio,
-						 3.0f*fRatio*fRatio*(1.0-fRatio),
+	float CM = (1.0f-fRatio);
+    return dot(s,float4(CM*CM*CM,
+						 3.0f*CM*CM*fRatio,
+						 3.0f*fRatio*fRatio*CM,
 						 fRatio*fRatio*fRatio))/w;
 }
 #endif
@@ -557,11 +558,9 @@ bool cheap_reject(float3 tc,inout bool full_light)
       {
          full_light=false;
          return true;
- }
+	  }
       else
-      {
-         return false;
- }
+        return false;
 }
    else //plane equation detected
    {
@@ -617,10 +616,6 @@ float shadow_hw_hq(float4 tc)
 #endif //	SM_MINMAX
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//	D24X8+PCF
-//////////////////////////////////////////////////////////////////////////////////////////
-
 float4 	test 		(float4 tc,float2 offset)
 {
 	tc.xyz/=tc.w;
@@ -636,41 +631,38 @@ half 	shadowtest_sun 	(float4 tc)			//jittered sampling
 
 	float2 	tc_J=frac(tc.xy/tc.w*SMAP_size/4.0f)*.5f;
 	float4	J0=jitter0.Sample(smp_jitter,tc_J)*scale;
-	//half4	J1=tex2D	(jitter1,tc_J)*scale;
-	half4	r;
 	const float k=.5f/float(SMAP_size);
-	r.x=test 	(tc,J0.xy+half2(-k,-k)).x;
-	r.y=test 	(tc,J0.wz+half2(k,-k)).y;
-	r.z=test	(tc,-J0.xy+half2(-k,k)).z;
-	r.w=test	(tc,-J0.wz+half2(k,k)).x;
+	half4 r;
+	r.x=test(tc,J0.xy+half2(-k,-k)).x;
+	r.y=test(tc,J0.wz+half2(k,-k)).y;
+	r.z=test(tc,-J0.xy+half2(-k,k)).z;
+	r.w=test(tc,-J0.wz+half2(k,k)).x;
 
 	return	dot(r,1.h/4.h);
 }
 
 half 	shadow_high 	(float4 tc)			//jittered sampling
 {
-
-	const	float 	scale=(0.5f/float(SMAP_size));
+	float k=(0.5f/float(SMAP_size));
 
 	float2 	tc_J=frac(tc.xy/tc.w*SMAP_size/4.0f)*.5f;
-	float4	J0=jitter0.Sample	(smp_jitter,tc_J)*scale;
+	float4	J0=jitter0.Sample(smp_jitter,tc_J)*k;
 
-	const float k=1.f/float(SMAP_size);
+	k=1.f/float(SMAP_size);
 	half4	r;
-	r.x=test 	(tc,J0.xy+half2(-k,-k)).x;
-	r.y=test 	(tc,J0.wz+half2(k,-k)).y;
+	r.x=test(tc,J0.xy+half2(-k,-k)).x;
+	r.y=test(tc,J0.wz+half2(k,-k)).y;
 
-	r.z=test	(tc,J0.xy+half2(-k,k)).z;
-	r.w=test	(tc,J0.wz+half2(k,k)).x;
+	r.z=test(tc,J0.xy+half2(-k,k)).z;
+	r.w=test(tc,J0.wz+half2(k,k)).x;
 
-
-	const float k1=1.3f/float(SMAP_size);
+	k=1.3f/float(SMAP_size);
 	half4	r1;
-	r1.x=test 	(tc,-J0.xy+half2(-k1,0)).x;
-	r1.y=test 	(tc,-J0.wz+half2(0,-k1)).y;
+	r1.x=test(tc,-J0.xy+half2(-k,0)).x;
+	r1.y=test(tc,-J0.wz+half2(0,-k)).y;
 
-	r1.z=test	(tc,-2*J0.xy+half2(k1,0)).z;
-	r1.w=test	(tc,-2*J0.wz+half2(0,k1)).x;
+	r1.z=test(tc,-2*J0.xy+half2(k,0)).z;
+	r1.w=test(tc,-2*J0.wz+half2(0,k)).x;
 
 	return (r.x+r.y+r.z+r.w+r1.x+r1.y+r1.z+r1.w)*1.h/8.h;
 }
@@ -705,12 +697,12 @@ float shadow_volumetric(float4 tc)
 //hardware+PCF
 //////////////////////////////////////////////////////////////////////////////////////////
 
-float shadow_dx10_1(float4 tc,float2 tcJ,float2 pos2d)
+float shadow_dx10_1(float4 tc)
 {
    return shadow(tc);
 }
 
-float shadow_dx10_1_sunshafts(float4 tc,float2 pos2d)
+float shadow_dx10_1_sunshafts(float4 tc)
 {
    float3 t   =tc.xyz/tc.w;
    float minmax=s_smap_minmax.SampleLevel(smp_nofilter,t,0).x;
@@ -719,11 +711,9 @@ float shadow_dx10_1_sunshafts(float4 tc,float2 pos2d)
    [branch] if(umbra)
    {
       return 0.0;
-}
+	}
    else
-   {
       return shadow_hw(tc);
-}
 }
 
 #endif
@@ -759,8 +749,6 @@ float 	shadow_rain 	(float4 tc,float2 tcJ)			//jittered sampling
 	float4	r;
 
 	const 	float 	scale=(4.0f/float(SMAP_size));
-//	float4	J0=jitter0.Sample(smp_jitter,tcJ)*scale;
-//	float4	J1=jitter1.Sample(smp_jitter,tcJ)*scale;
 	float4	J0=jitter0.Sample(smp_linear,tcJ)*scale;
 	float4	J1=jitter1.Sample(smp_linear,tcJ)*scale;
 
@@ -768,13 +756,6 @@ float 	shadow_rain 	(float4 tc,float2 tcJ)			//jittered sampling
 	r.y=test 	(tc,J0.wz).y;
 	r.z=test	(tc,J1.xy).z;
 	r.w=test	(tc,J1.wz).x;
-
-//	float4	J0=jitterMipped.Sample(smp_base,tcJ)*scale;
-
-//	r.x=test 	(tc,J0.xy).x;
-//	r.y=test 	(tc,J0.wz).y;
-//	r.z=test	(tc,J0.yz).z;
-//	r.w=test	(tc,J0.xw).x;
 
 	return	dot(r,1.h/4.h);
 }

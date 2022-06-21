@@ -87,7 +87,7 @@ float4 main (v2p_volume I):SV_Target
 	#else
 #ifdef SM_MINMAX
 		#ifdef USE_SJITTER
-	  		s*=shadow_dx10_1(PS,I.tcJ,I.hpos.xy);
+	  		s*=shadow_dx10_1(PS);
 		#else
 			s*=shadow(PS);
 		#endif

@@ -96,7 +96,7 @@ float4 	main (v2p_volume  I):SV_Target
 #ifndef SM_MINMAX
 				res+=density*shadow(current);
 #else
-				res+=density*shadow_dx10_1_sunshafts(current,pos2d.xy);
+				res+=density*shadow_dx10_1_sunshafts(current);
 #endif
 #else	//	FILTER_LOW
 				res+=density*sample_hw_pcf(current,float4(0,0,0,0));
