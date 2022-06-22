@@ -2,6 +2,15 @@
 #include "sload.h"
 
 #define	USE_4_DETAIL
+uniform sampler2D       s_mask;
+uniform sampler2D       s_dt_r;
+uniform sampler2D       s_dt_g;
+uniform sampler2D       s_dt_b;
+uniform sampler2D       s_dt_a;
+uniform sampler2D       s_dn_r;
+uniform sampler2D       s_dn_g;
+uniform sampler2D       s_dn_b;
+uniform sampler2D       s_dn_a;
 
 #if defined(USE_TDETAIL)&& defined(USE_4_DETAIL)
 #	define	USE_4_BUMP
@@ -15,8 +24,8 @@ f_deffer 	main	(p_flat I)
 {
 	f_deffer	O;
 
- 	//diffuse
-	half4 D=tbase		(I.tcdh);//IN: rgb.a
+ 	
+	half4 D=tbase		(I.tcdh);
 	half4 L=tex2D		(s_lmap,I.tcdh);
 
 	half	G=def_gloss;
@@ -47,12 +56,12 @@ f_deffer 	main	(p_flat I)
 	 half3	n_A=(n_At-0.5)*mask.a;half g_A=n_At.w*mask.a;
 
 	 half3	mix=n_R+n_G+n_B+n_A;
-			mix.z*=0.5;//. make bump twice as contrast (fake,remove me if possible)
+			mix.z*=0.5;
 	 half3	N=mul     	(half3x3(I.M1,I.M2,I.M3),mix.xyz);
 
 	 	 	G=g_R+g_G+g_B+g_A;
-//			G=0;
-//			G=mix.w;//gloss
+
+
   # else
 	half3	N=I.N.xyz;
   # endif
@@ -64,16 +73,16 @@ f_deffer 	main	(p_flat I)
 	half3	N=I.N.xyz;
 # endif
 
-	//hemi,sun,material
+	
 	half 	ms=xmaterial;
 # ifdef USE_R2_STATIC_SUN
 		 	ms=L.w;
 # endif
 
-  //2. Standart output
-  O.Ne    =half4		(normalize(N),					D.w);//hemi
-  O.position=half4 	(I.position.xyz+O.Ne.xyz*def_virtualh/2.h,ms);//
-  O.C=half4		(D.x,D.y,D.z,			G);//OUT:rgb.gloss
+  
+  O.Ne    =half4		(normalize(N),					D.w);
+  O.position=half4 	(I.position.xyz+O.Ne.xyz*def_virtualh/2.h,ms);
+  O.C=half4		(D.x,D.y,D.z,			G);
 
   return O;
 }

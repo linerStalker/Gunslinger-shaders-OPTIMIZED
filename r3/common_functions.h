@@ -1,15 +1,19 @@
 #ifndef	common_functions_h_included
 #define	common_functions_h_included
 
-//	contrast function
+
 float Contrast(float Input,float ContrastPower)
 {
-     //piecewise contrast function
-     bool IsAboveHalf=Input>0.5;
-     float ToRaise=saturate(2*(IsAboveHalf?1-Input:Input));
-     float Output=0.5*pow(ToRaise,ContrastPower);
-     Output=IsAboveHalf?1-Output:Output;
-     return Output;
+	bool IsAboveHalf=Input>0.5;
+	float ToRaise=saturate(2*(IsAboveHalf?1-Input:Input));
+	float Output=0.5*pow(ToRaise,ContrastPower);
+	Output=IsAboveHalf?1-Output:Output;
+	return Output;
+}
+
+float get_noise(float2 co)
+{
+	return (frac(sin(dot(co.xy ,float2(12.9898,78.233)))*43758.5453))*0.5;
 }
 
 void tonemap(out float4 low,out float4 high,float3 rgb,float scale)
@@ -50,17 +54,17 @@ float3 calc_model_lq_lighting(float3 norm_w)
 }
 
 float3 	unpack_bx2(float3 v)	{return 2*v-1;}
-float3 	unpack_bx4(float3 v)	{return 4*v-2;} //!reduce the amount of stretching from 4*v-2 and increase precision
-float2 	unpack_tc_lmap(float2 tc)	{return tc*(1.f/32768.f);} //[-1  ..+1] 
+float3 	unpack_bx4(float3 v)	{return 4*v-2;} 
+float2 	unpack_tc_lmap(float2 tc)	{return tc*(1.f/32768.f);} 
 float4	unpack_color(float4 c){return c.bgra;}
 float4	unpack_D3DCOLOR(float4 c){return c.bgra;}
 float3	unpack_D3DCOLOR(float3 c){return c.bgr;}
 
 float3   p_hemi(float2 tc)
 {
-//	float3	t_lmh=tex2D (s_hemi,tc);
-//	float3	t_lmh=s_hemi.Sample(smp_rtlinear,tc);
-//	return	dot(t_lmh,1.h/4.h);
+
+
+
 	float4	t_lmh=s_hemi.Sample(smp_rtlinear,tc);
 	return	t_lmh.a;
 }
@@ -90,16 +94,16 @@ float3	calc_reflection(float3 pos_w,float3 norm_w)
 #define USABLE_BIT_8                uint(0x00100000)
 #define USABLE_BIT_9                uint(0x00200000)
 #define USABLE_BIT_10               uint(0x00400000)
-#define USABLE_BIT_11               uint(0x00800000)//At least two of those four bit flags must be mutually exclusive (i.e. all 4 bits must not be set together)
-#define USABLE_BIT_12               uint(0x01000000)//This is because setting 0x47800000 sets all 5 FP16 exponent bits to 1 which means infinity
-#define USABLE_BIT_13               uint(0x02000000)//This will be translated to a+/-MAX_FLOAT in the FP16 render target (0xFBFF/0x7BFF),overwriting the 
-#define USABLE_BIT_14               uint(0x04000000)//mantissa bits where other bit flags are stored.
+#define USABLE_BIT_11               uint(0x00800000)
+#define USABLE_BIT_12               uint(0x01000000)
+#define USABLE_BIT_13               uint(0x02000000)
+#define USABLE_BIT_14               uint(0x04000000)
 #define USABLE_BIT_15               uint(0x80000000)
-#define MUST_BE_SET                 uint(0x40000000)//This flag*must*be stored in the floating-point representation of the bit flag to store
+#define MUST_BE_SET                 uint(0x40000000)
 
 
-//Holger Gruen AMD-I change normal packing and unpacking to make sure N.z is accessible without ALU cost
-//this help the HDAO compute shader to run more efficiently
+
+
 float2 gbuf_pack_normal(float3 norm)
 {
    float2 res;
@@ -125,7 +129,7 @@ float3 gbuf_unpack_normal(float2 norm)
 float gbuf_pack_hemi_mtl(float hemi,float mtl)
 {
    uint packed_mtl=uint((mtl/1.333333333)*31.0);
-	//	Clamp hemi max value
+	
 	uint packed=(MUST_BE_SET+(uint(saturate(hemi)*255.9)<<13)+((packed_mtl & uint(31))<<21));
 
    if((packed & USABLE_BIT_13)==0)
@@ -190,23 +194,23 @@ gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD,float2 pos2d,int iSample)
 	float4 P=s_position.Sample(smp_nofilter,tc);
 #endif
 
-	//3d view space pos reconstruction math
-	//center of the plane (0,0)or (0.5,0.5)at distance 1 is eyepoint(0,0,0)+lookat (assuming |lookat|==1
-	//left/right=(0,0,1)-/+tan(fHorzFOV/2)*(1,0,0)
-	//top/bottom=(0,0,1)+/-tan(fVertFOV/2)*(0,1,0)
-	//lefttop=(-tan(fHorzFOV/2),tan(fVertFOV/2),1)
-	//righttop=(tan(fHorzFOV/2),tan(fVertFOV/2),1)
-	//leftbottom=(-tan(fHorzFOV/2),-tan(fVertFOV/2),1)
-	//rightbottom=(tan(fHorzFOV/2),-tan(fVertFOV/2),1)
+	
+	
+	
+	
+	
+	
+	
+	
 	gbd.P=float3(P.z*(pos2d*pos_decompression_params.zw-pos_decompression_params.xy),P.z);
 
-	//reconstruct N
+	
 	gbd.N=gbuf_unpack_normal(P.xy);
 
-	//reconstruct material
+	
 	gbd.mtl=gbuf_unpack_mtl(P.w);
 
-   //reconstruct hemi
+   
    gbd.hemi=gbuf_unpack_hemi(P.w);
 
 #ifdef USE_MSAA
@@ -240,7 +244,7 @@ gbuffer_data gbuffer_load_data_offset(float2 tc:TEXCOORD,float2 OffsetTC:TEXCOOR
    return gbuffer_load_data(OffsetTC,pos2d+delta,iSample);
 }
 
-#else //GBUFFER_OPTIMIZATION
+#else 
 gbuffer_data gbuffer_load_data(float2 tc:TEXCOORD,uint iSample)
 {
 	gbuffer_data gbd;
@@ -281,7 +285,7 @@ gbuffer_data gbuffer_load_data_offset(float2 OffsetTC:TEXCOORD,uint iSample)
    return gbuffer_load_data(OffsetTC,iSample);
 }
 
-#endif //GBUFFER_OPTIMIZATION
+#endif 
 
 #if (defined(MSAA_ALPHATEST_DX10_1_ATOC)|| defined(MSAA_ALPHATEST_DX10_1))
 
@@ -332,7 +336,7 @@ uint alpha_to_coverage (float alpha,uint mask)
 	{
 		if(alpha<0.1111)
 			return 0;
-		else //only one bit set 0.2222
+		else 
 			return 1;
 	}
 	else 
@@ -368,4 +372,4 @@ uint alpha_to_coverage (float alpha,uint mask)
 
 
 
-#endif	//	common_functions_h_included
+#endif	

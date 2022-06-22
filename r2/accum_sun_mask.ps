@@ -1,10 +1,16 @@
 #include "common.h"
+struct p_screen
+{
+	float4 hpos :POSITION;
+	float2 tc0 :TEXCOORD0;
+};
+
 
 #define EPS	(0.9f/255.f)
 half4 	main		(p_screen I)	:COLOR
 {
-  //Sample the fat framebuffer:
+  
   half4 NH=tex2D 		(s_normal,I.tc0);
-  half	L=NH.w*dot	(Ldynamic_dir,(half3)NH)+EPS;//Use hemisphere as approximation of max light
+  half	L=NH.w*dot	(Ldynamic_dir,(half3)NH)+EPS;
   return  		half4			(L,L,L,L);
 }
