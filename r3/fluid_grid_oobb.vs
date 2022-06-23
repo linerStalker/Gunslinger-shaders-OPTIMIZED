@@ -1,7 +1,5 @@
 #include "fluid_common.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//	Vertex
 v2g_fluidsim_clip main(v_fluidsim input)
 {
     v2g_fluidsim_clip output=(v2g_fluidsim_clip)0;
@@ -16,7 +14,7 @@ v2g_fluidsim_clip main(v_fluidsim input)
     float y=output.texcoords.y;
     float z=output.texcoords.z;
 
-    //compute single texel offsets in each dimension
+    
     float invW=1.0/textureWidth;
     float invH=1.0/textureHeight;
     float invD=1.0/textureDepth;
@@ -25,17 +23,11 @@ v2g_fluidsim_clip main(v_fluidsim input)
     output.BT=float2(y-invH,y+invH);
     output.DU=float2(z-invD,z+invD);
 
-//	float3	clip0				:SV_ClipDistance0;
-//	float3	clip1				:SV_ClipDistance1;
-	for (int i=0;i<3;++i)
+	for (uint i=0;i<3;++i)
 	{
 		output.clip0[i]=dot(float4(output.cell0,1),OOBBClipPlane[i]);
 		output.clip1[i]=dot(float4(output.cell0,1),OOBBClipPlane[i+3]);
-		//	Make box a voxel bigger in each direction
-		//	BOX_EXPANSION-voxel diagonal length
-		//output.clip0[i]+=BOX_EXPANSION;
-		//output.clip1[i]+=BOX_EXPANSION;
-}
+	}
 
     return output;
 }

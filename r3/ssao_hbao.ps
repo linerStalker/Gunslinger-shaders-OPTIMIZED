@@ -5,10 +5,10 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
 	return 1.0;
 }
 
-#else	//	SSAO_QUALITY
+#else	
 
-//cbuffer PixelGlobalShaderData_s:register(b0)
-//{
+
+
 
 uniform	float4		screen_res;
 
@@ -28,7 +28,7 @@ static const float g_NumDir=4.0f;
 static const float g_NumSteps=3.0f;
 #endif
 
-//static const float g_Contrast=1.5f;
+
   static const float g_Contrast=0.8f;
   static const float g_AngleBias=0.0f;
 
@@ -41,20 +41,20 @@ uniform texture2D 	jitter4;
 
 #define M_PI 3.1415926f
 
-//----------------------------------------------------------------------------------
+
 struct PostProc_VSOut
 {
     float4 pos  :SV_Position;
     float2 texUV:TEXCOORD0;
 };
 
-//----------------------------------------------------------------------------------
+
 float tangent(float3 P,float3 S)
 {
     return (P.z-S.z)/ length(S.xy-P.xy);
 }
 
-//----------------------------------------------------------------------------------
+
 float tangent(float3 T)
 {
     return-T.z/length(T.xy);
@@ -62,7 +62,7 @@ float tangent(float3 T)
 
 float length2(float3 v){return dot(v,v);} 
 
-//----------------------------------------------------------------------------------
+
 float3 min_diff(float3 P,float3 Pr,float3 Pl)
 {
     float3 V1=Pr-P;
@@ -70,36 +70,36 @@ float3 min_diff(float3 P,float3 Pr,float3 Pl)
     return (length2(V1)<length2(V2))?V1:V2;
 }
 
-//----------------------------------------------------------------------------------
-//there's a hack in r3 that forbides enable SSAO_OPT_DATA if hbao is enabled automatically
-//fix that later
+
+
+
 float3 fetch_eye_pos(float2 uv)
 {
-////#define SSAO_OPT_DATA
+
 #ifndef SSAO_OPT_DATA
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd=gbuffer_load_data_offset(tc,tap,pos2d,iSample);//this is wrong-need to correct this
+		gbuffer_data gbd=gbuffer_load_data_offset(tc,tap,pos2d,iSample);
 #else
 		gbuffer_data gbd=gbuffer_load_data(tap,iSample);
 #endif
 #else
 #ifdef GBUFFER_OPTIMIZATION
-		gbuffer_data gbd=gbuffer_load_data_offset(tc,tap,pos2d);//this is wrong-need to correct this
+		gbuffer_data gbd=gbuffer_load_data_offset(tc,tap,pos2d);
 #else
 		gbuffer_data gbd=gbuffer_load_data(tap,0);
 #endif
 #endif
 
-		//float3	tap_pos=s_position.Sample(smp_nofilter,tap);
+		
 		float3	tap_pos=gbd.P;
-#else //SSAO_OPT_DATA
+#else 
     float z=s_half_depth.SampleLevel(smp_nofilter,uv,0);
     return uv_to_eye(uv,z);
-#endif //SSAO_OPT_DATA
+#endif 
 }
 
-//----------------------------------------------------------------------------------
+
 float falloff(float r)
 {
     return 1.0f-r*r;
@@ -110,7 +110,7 @@ float4 falloff4(float4 r)
     return ((1.0f).xxxx-r*r);
 }
 
-//----------------------------------------------------------------------------------
+
 float2 snap_uv_offset(float2 uv)
 {
     return round(uv*g_Resolution)*g_InvResolution;
@@ -118,17 +118,17 @@ float2 snap_uv_offset(float2 uv)
 
 float2 snap_uv_coord(float2 uv)
 {
-    //return (floor(uv*g_Resolution)+0.5f)*g_InvResolution;
+    
     return uv-(frac(uv*g_Resolution)-0.5f)*g_InvResolution;
 }
 
-//----------------------------------------------------------------------------------
+
 float tan_to_sin(float x)
 {
     return x/sqrt(1.0f+x*x);
 }
 
-//----------------------------------------------------------------------------------
+
 float3 tangent_vector(float2 deltaUV,float3 dPdu,float3 dPdv)
 {
     return deltaUV.x*dPdu+deltaUV.y*dPdv;
@@ -136,22 +136,22 @@ float3 tangent_vector(float2 deltaUV,float3 dPdu,float3 dPdv)
 
 float3 tangent_eye_pos(float2 uv,float4 tangentPlane)
 {
-    //view vector going through the surface point at uv
+    
     float3 V=fetch_eye_pos(uv);
     float NdotV=dot(tangentPlane.xyz,V);
-    //intersect with tangent plane except for silhouette edges
+    
     if (NdotV<0.0)V*=(tangentPlane.w/NdotV);
     return V;
 }
 
-//----------------------------------------------------------------------------------
+
 float biased_tangent(float3 T)
 {
     float phi=atan(tangent(T))+g_AngleBias;
     return tan(min(phi,M_PI*0.5));
 }
 
-//----------------------------------------------------------------------------------
+
 void integrate_direction(inout float ao,float3 P,float2 uv,float2 deltaUV,
                          float numSteps,float tanH,float sinH)
 {
@@ -159,19 +159,19 @@ void integrate_direction(inout float ao,float3 P,float2 uv,float2 deltaUV,
         uv+=deltaUV;
         float3 S=fetch_eye_pos(uv);
         
-        //Ignore any samples outside the radius of influence
+        
         float d2=length2(S-P);
         if (d2<g_sqr_R){
             float tanS=tangent(P,S);
 
             [branch]
             if(tanS>tanH){
-                //Accumulate AO between the horizon and the sample
+                
                 float sinS=tanS/sqrt(1.0f+tanS*tanS);
                 float r=sqrt(d2)*g_inv_R;
                 ao+=falloff(r)*(sinS-sinH);
                 
-                //Update the current horizon angle
+                
                 tanH=tanS;
                 sinH=sinS;
        }
@@ -179,38 +179,38 @@ void integrate_direction(inout float ao,float3 P,float2 uv,float2 deltaUV,
 }
 }
 
-//----------------------------------------------------------------------------------
+
 float horizon_occlusion_integrateDirection(float2 deltaUV,
                                            float2 uv0,
                                            float3 P,
                                            float numSteps,
                                            float randstep)
 {
-    //Randomize starting point within the first sample distance
+    
     float2 uv=uv0+snap_uv_offset(randstep*deltaUV);
     
-    //Snap increments to pixels to avoid disparities between xy 
-    //and z sample locations and sample along a line
+    
+    
     deltaUV=snap_uv_offset(deltaUV);
 
-    //Add a small bias in case (g_AngleBias==0.0)
+    
     float tanT=tan(-M_PI*0.5+g_AngleBias+1.e-5);
     float sinT=tan_to_sin(tanT);
 
     float ao=0;
     integrate_direction(ao,P,uv,deltaUV,numSteps,tanT,sinT);
 
-    //Integrate opposite directions together
+    
     deltaUV=-deltaUV;
     uv=uv0+snap_uv_offset(randstep*deltaUV);
     integrate_direction(ao,P,uv,deltaUV,numSteps,tanT,sinT);
 
-    //Divide by 2 because we have integrated 2 directions together
-    //Subtract 1 and clamp to remove the part below the surface
+    
+    
     return max(ao*0.5-1.0,0.0);
 }
 
-//----------------------------------------------------------------------------------
+
 float horizon_occlusion2(float2 deltaUV,
                          float2 uv0,
                          float3 P,
@@ -220,14 +220,14 @@ float horizon_occlusion2(float2 deltaUV,
                          float3 dPdv)
 {
 
-    //Randomize starting point within the first sample distance
+    
     float2 uv=uv0+snap_uv_offset(randstep*deltaUV);
     
-    //Snap increments to pixels to avoid disparities between xy 
-    //and z sample locations and sample along a line
+    
+    
     deltaUV=snap_uv_offset(deltaUV);
 
-    //Compute tangent vector using the tangent plane
+    
     float3 T=deltaUV.x*dPdu+deltaUV.y*dPdv;
 
     float tanH=tangent(T);
@@ -238,17 +238,17 @@ float horizon_occlusion2(float2 deltaUV,
         uv+=deltaUV;
         float3 S=fetch_eye_pos(uv);
         
-        //Ignore any samples outside the radius of influence
+        
         float d2=length2(S-P);
         float tanS=tangent(P,S);
 	[branch]
         if ((d2<g_sqr_R)&& (tanS>tanH)){
-                //Accumulate AO between the horizon and the sample
+                
                 float sinS=tanS/sqrt(1.0f+tanS*tanS);
                 float r=sqrt(d2)*g_inv_R;
                 ao+=falloff(r)*(sinS-sinH);
                 
-                //Update the current horizon angle
+                
                 tanH=tanS;
                 sinH=sinS;
    } 
@@ -257,7 +257,7 @@ float horizon_occlusion2(float2 deltaUV,
     return ao;
 }
 
-//----------------------------------------------------------------------------------
+
 float horizon_occlusion2_4way(float2 deltaUV0,
                               float2 deltaUV1,
                               float2 deltaUV2,
@@ -270,20 +270,20 @@ float horizon_occlusion2_4way(float2 deltaUV0,
                               float3 dPdv)
 {
 
-    //Randomize starting point within the first sample distance
+    
     float2 uv0=uv_0+snap_uv_offset(randstep*deltaUV0);
     float2 uv1=uv_0+snap_uv_offset(randstep*deltaUV1);
     float2 uv2=uv_0+snap_uv_offset(randstep*deltaUV2);
     float2 uv3=uv_0+snap_uv_offset(randstep*deltaUV3);
     
-    //Snap increments to pixels to avoid disparities between xy 
-    //and z sample locations and sample along a line
+    
+    
     deltaUV0=snap_uv_offset(deltaUV0);
     deltaUV1=snap_uv_offset(deltaUV1);
     deltaUV2=snap_uv_offset(deltaUV2);
     deltaUV3=snap_uv_offset(deltaUV3);
 
-    //Compute tangent vector using the tangent plane
+    
     float3 T0=deltaUV0.x*dPdu+deltaUV0.y*dPdv;
     float3 T1=deltaUV1.x*dPdu+deltaUV1.y*dPdv;
     float3 T2=deltaUV2.x*dPdu+deltaUV2.y*dPdv;
@@ -305,7 +305,7 @@ float horizon_occlusion2_4way(float2 deltaUV0,
         float3 S2=fetch_eye_pos(uv2);
         float3 S3=fetch_eye_pos(uv3);
         
-        //Ignore any samples outside the radius of influence
+        
         float4 d2=float4(length2(S0-P),length2(S1-P),
                               length2(S2-P),length2(S3-P));
         float4 tanS=float4(tangent(P,S0),tangent(P,S1),
@@ -337,7 +337,7 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
     step_size=step_size/(numSteps+1);
 
 
-//(cos(alpha),sin(alpha),jitter)
+
 #ifndef HBAO_WORLD_JITTER
     float3 rand_Dir=jitter4.Load(int3((int)pos2d.x&63,(int)pos2d.y&63,0)).xyz;
 #else
@@ -348,7 +348,7 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
 #endif
 
 
-	//footprint optimization
+	
 	float maxNumSteps=g_MaxFootprintUV/step_size;
 	if (maxNumSteps<numSteps)
 	{
@@ -367,7 +367,7 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
     float3 dPdv=min_diff(P,Pt,Pb)*(g_Resolution.y*g_InvResolution.x);
 
     
-    //Loop for all directions
+    
     float ao=0;
     float alpha=2.0f*M_PI/g_NumDir;
     float delta=g_NumDir/numDirs;
@@ -375,7 +375,7 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
     int   iNumDir=ceil(int(g_NumDir/delta));
     
 #ifndef VECTORIZED_CODE    
-    for (int i=0;i<iNumDir;++i){
+    for (uint i=0;i<iNumDir;++i){
         float d=float(i)*delta;
 	    float angle=alpha*d;
 	    float2 dir=float2(cos(angle),sin(angle));
@@ -384,11 +384,11 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
 						*step_size.xy;
 	    
 	    ao+=horizon_occlusion2(deltaUV,tc0,P,numSteps,rand_Dir.z,dPdu,dPdv);
-        //ao+=horizon_occlusion_integrateDirection(deltaUV,tc0,P,numSteps,rand_Dir.z);
+        
 
 }
-#else //VECTORIZED_CODE
-    for (int i=0;i<(iNumDir/4);++i){
+#else 
+    for (uint i=0;i<(iNumDir/4);++i){
   
         float d=float(i)*delta;
 	    float4 angle=alpha*float4(4.0f*d+0.0f*delta,4.0f*d+1.0f*delta,
@@ -413,8 +413,8 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
 	                                  tc0,P,numSteps,rand_Dir.z,dPdu,dPdv);
 	}
 	
-    //Handle remaining directions that are not a multiple of 4. Only define this if the number of directions required
-    //is not a multiple of 4.
+    
+    
     for (i=4*(iNumDir/4);i<iNumDir;++i){
         float d=float(i)*delta;
     	float angle=alpha*d;
@@ -426,11 +426,11 @@ float4 calc_hbao(float z,float3 N,float2 tc0,float4 pos2d)
 	    ao+=horizon_occlusion2(deltaUV,tc0,P,numSteps,rand_Dir.z,dPdu,dPdv);
    }
 
-#endif //VECTORIZED_CODE
+#endif 
 
 	float WeaponAttenuation=smoothstep(0.8,0.9,length(P.xyz));
 
     return 1.0-ao/g_NumDir*(g_Contrast*WeaponAttenuation);
 }
 
-#endif	//	SSAO_QUALITY
+#endif	

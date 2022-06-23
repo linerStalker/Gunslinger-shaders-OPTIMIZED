@@ -3,15 +3,15 @@
 
 #include "common.h"
 
-//uniform	sampler	s_smap	:register(ps,s0);//2D/cube shadowmap
-//Texture2D<float>	s_smap;//2D/cube shadowmap
-//	Used for RGBA texture too?!
-Texture2D	s_smap:register(ps,t0);//2D/cube shadowmap
 
-Texture2D<float>	s_smap_minmax;//2D/cube shadowmap
+
+
+Texture2D	s_smap:register(ps,t0);
+
+Texture2D<float>	s_smap_minmax;
 #include "gather.ps"
 
-SamplerComparisonState		smp_smap;//	Special comare sampler
+SamplerComparisonState		smp_smap;
 sampler		smp_jitter;
 
 Texture2D jitter0, jitter1, jitterMipped;
@@ -27,9 +27,9 @@ float modify_light(float l)
    return (l>0.7?1.0:lerp(0.0,1.0,saturate(l/0.7)));
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//hardware+PCF
-//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 float sample_hw_pcf (float4 tc,float4 shift)
 {
 	static const float 	ts=KERNEL/float(SMAP_size);
@@ -99,8 +99,7 @@ static const float W0[11][11]=
 			       {0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0},
 			  };
 
-typedef unsigned char u8;
-float Fw(u8 r,u8 c,float fL)
+float Fw(uint r,uint c,float fL)
 {
 	float CA = (1.0-fL);
 	return CA*CA*CA*W0[r][c]+
@@ -115,7 +114,7 @@ float Fw(u8 r,u8 c,float fL)
 
 #define SUN_WIDTH 300.0f
 
-//uses gather for DX11/10.1 and visibilty encoding for DX10.0
+
 float shadow_extreme_quality(float3 tc)
 {
    float  s=0.0f, w=0.0f, avgBlockerDepth=0.0f, blockerCount=0.0f, fRatio;
@@ -129,7 +128,7 @@ float shadow_extreme_quality(float3 tc)
    tc.z-=0.0001f;
 
 #if defined(SM_4_1)|| defined(SM_5)
-    //find number of blockers and sum up blocker depth
+    
     for(int row=-BFS2;row<=BFS2;row+=2)
     {
         for(int col=-BFS2;col<=BFS2;col+=2)
@@ -141,10 +140,10 @@ float shadow_extreme_quality(float3 tc)
             avgBlockerDepth+=dot(d4,b4);
    }
 }
-#else //SM_4_0
+#else 
 	uint vmask[FS+1];
 
-    [unroll]for(u8 col=0;col<=FS;++col)
+    [unroll]for(uint col=0;col<=FS;++col)
 		vmask[col]=uint(0);
 	
 	[unroll(11)]for(int row=-FS2;row<=FS2;row+=2)
@@ -180,7 +179,7 @@ float shadow_extreme_quality(float3 tc)
 }
 #endif
    
-   //compute ratio average blocker depth vs. pixel depth
+   
    if(blockerCount>0.0)
    {
 	   avgBlockerDepth/=blockerCount;
@@ -190,13 +189,13 @@ float shadow_extreme_quality(float3 tc)
    else
 	   fRatio=0.0;
 
-   for(u8 row=0;row<FS;++row)
+   for(uint row=0;row<FS;++row)
    {
-      for(u8 col=0;col<FS;++col)
+      for(uint col=0;col<FS;++col)
          w+=Fw(row,col,fRatio);
 	}
 
-    //filter shadow map samples using the dynamic weights
+    
     [unroll(11)]for(int row=-FS2;row<=FS2;row+=2)
     {
         [unroll]for(int col=-FS2;col<=FS2;col+=2)
@@ -206,7 +205,7 @@ float shadow_extreme_quality(float3 tc)
 #ifdef SM_5
             v1[X]=s_smap.GatherCmpRed(smp_smap,tc.xy,tc.z,
                                                    int2(col,row));
-#else //SM_4_1
+#else 
 			{float4 d4=s_smap.Gather(smp_linear,tc.xy,int2(col,row));
             v1[X]=(tc.zzzz<=d4)?(1.0f).xxxx:(0.0f).xxxx;}
 #endif
@@ -264,14 +263,14 @@ float shadow_extreme_quality(float3 tc)
    return s/w;
 }
 
-float4 Fw(u8 r,u8 c)
+float4 Fw(uint r,uint c)
 {
 	return float4(W0[r][c],W1[r][c],W2[r][c],1.0f);
 }
 
-//======================================================================================
-//This shader computes the contact hardening shadow filter
-//======================================================================================
+
+
+
 float shadow_extreme_quality_fused(float3 tc)
 {
     float4 s=(0.0f).xxxx;
@@ -285,7 +284,7 @@ float shadow_extreme_quality_fused(float3 tc)
 	const float ZN = 1.0f/SMAP_size;
     tc.xy=tc.xy-(fc*ZN);
 
-    //filter shadow map samples using the dynamic weights
+    
     [unroll(FS)]for(int row=-FS2;row<=FS2;row+=2)
     {
         for(int col=-FS2;col<=FS2;col+=2)
@@ -407,7 +406,7 @@ float shadow_extreme_quality_fused(float3 tc)
    }
 }
 
-    //compute ratio using formulas from PCSS
+    
     if(blockerCount>0.0)
     {
         avgBlockerDepth/=blockerCount;
@@ -417,10 +416,10 @@ float shadow_extreme_quality_fused(float3 tc)
     else
         fRatio=0.0;
 
-    //sum up weights of dynamic filter matrix
-    for(u8 row=0;row<FS;++row)
+    
+    for(uint row=0;row<FS;++row)
     {
-       for(u8 col=0;col<FS;++col)
+       for(uint col=0;col<FS;++col)
           w+=Fw(row,col,fRatio);
 	}
 
@@ -444,38 +443,38 @@ float dx10_1_hw_hq_7x7(float3 tc)
    fc.xy=stc-tcs;
    tc.xy=tcs*(1.0/SMAP_size);
    
-   //loop over the rows
+   
    for(int row=-GS2;row<=GS2;row+=2)
    {
        [unroll]for(int col=-GS2;col<=GS2;col+=2)
        {
             float4 v=(tc.zzzz<=s_smap.Gather(smp_nofilter,tc.xy,int2(col,row)))?(1.0).xxxx:(0.0).xxxx;
             
-            if(row==-GS2)//top row
+            if(row==-GS2)
             {
-                if(col==-GS2)//left
+                if(col==-GS2)
                     s+=dot(float4(1.0-fc.x,1.0,1.0-fc.y,(1.0-fc.x)*(1.0-fc.y)),v);
-                else if(col==GS2)//right
+                else if(col==GS2)
                     s+=dot(float4(1.0f,fc.x,fc.x*(1.0-fc.y),1.0-fc.y),v);
-                else //center
+                else 
                     s+=dot(float4(1.0,1.0,1.0-fc.y,1.0-fc.y),v);
        }
-            else if(row==GS2)//bottom row
+            else if(row==GS2)
             {
-                if(col==-GS2)//left
+                if(col==-GS2)
                     s+=dot(float4((1.0-fc.x)*fc.y,fc.y,1.0,(1.0-fc.x)),v);
-                else if(col==GS2)//right
+                else if(col==GS2)
                     s+=dot(float4(fc.y,fc.x*fc.y,fc.x,1.0),v);
-                else //center
+                else 
                     s+=dot(float4(fc.yy,1.0,1.0),v);
        }
-            else //center rows
+            else 
             {
-                if(col==-GS2)//left
+                if(col==-GS2)
                     s+=dot(float4((1.0-fc.x),1.0,1.0,(1.0-fc.x)),v);
-                else if(col==GS2)//right
+                else if(col==GS2)
                     s+=dot(float4(1.0,fc.x,fc.x,1.0),v);
-                else //center
+                else 
                     s+=dot((1.0).xxxx,v);
        }
    }
@@ -507,31 +506,31 @@ float dx10_0_hw_hq_7x7(float4 tc)
    {
       for(int col=-GS2;col<=GS2;col+=2)
 	  {
-		if(row==-GS2)//top row
+		if(row==-GS2)
 		{
-			if(col==-GS2)//left
+			if(col==-GS2)
 				s+=(pwAB.x*pwAB.y)*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+tcAB,tc.z,int2(col,row)).x;
-			else if(col==GS2)//right
+			else if(col==GS2)
 				s+=(pwGH.x*pwAB.y)*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+float2(tcGH.x,tcAB.y),tc.z,int2(col,row)).x;
-			else //center
+			else 
 				s+=( 2.0*pwAB.y)*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+float2(tcM.x,tcAB.y),tc.z,int2(col,row)).x;
 }
-		else if(row==GS2)//bottom row
+		else if(row==GS2)
 		{
-			if(col==-GS2)//left
+			if(col==-GS2)
 				s+=(pwAB.x*pwGH.y)*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+float2(tcAB.x,tcGH.y),tc.z,int2(col,row)).x;
-			else if(col==GS2)//right
+			else if(col==GS2)
 				s+=(pwGH.x*pwGH.y)*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+tcGH,tc.z,int2(col,row)).x;
-			else //center
+			else 
 				s+=( 2.0*pwGH.y)*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+float2(tcM.x,tcGH.y),tc.z,int2(col,row)).x;
 }
-		else //center rows
+		else 
 		{
-			if(col==-GS2)//left
+			if(col==-GS2)
 				s+=(pwAB.x*2.0 )*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+float2(tcAB.x,tcM.y),tc.z,int2(col,row)).x;
-			else if(col==GS2)//right
+			else if(col==GS2)
 				s+=(pwGH.x*2.0 )*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+float2(tcGH.x,tcM.y),tc.z,int2(col,row)).x;
-			else //center
+			else 
 				s+=4.0*s_smap.SampleCmpLevelZero(smp_smap,tc.xy+tcM,tc.z,int2(col,row)).x;
 }
  }
@@ -549,7 +548,7 @@ bool cheap_reject(float3 tc,inout bool full_light)
    float4 plane3=sm_minmax_gather(tc.xy,int2(1,1));
    bool plane=all((plane0>=(0).xxxx)*(plane1>=(0).xxxx)*(plane2>=(0).xxxx)*(plane3>=(0).xxxx));
 
-   [flatten] if(!plane)//if there are no proper plane equations in the support region
+   [flatten] if(!plane)
    {
       bool no_plane=all((plane0<(0).xxxx)*(plane1<(0).xxxx)*(plane2<(0).xxxx)*(plane3<(0).xxxx));
       float4 z =(tc.z-0.0005).xxxx;
@@ -562,21 +561,21 @@ bool cheap_reject(float3 tc,inout bool full_light)
       else
         return false;
 }
-   else //plane equation detected
+   else 
    {
-      //compute corrected z for texel pos
+      
       static const float scale=float(SMAP_size/4);
       float2 fc=frac(tc.xy*scale);
       float  z=lerp(lerp(plane0.y,plane1.x,fc.x),lerp(plane2.z,plane3.w,fc.x),fc.y);
 
-      //do minmax test with new z
+      
       full_light=((tc.z-0.0001)<=z);
 
       return true;
 }
 }
 
-#endif	//	SM_MINMAX
+#endif	
 
 float shadow_hw_hq(float4 tc)
 {
@@ -593,27 +592,27 @@ float shadow_hw_hq(float4 tc)
 }
    else
    {
-#if SUN_QUALITY>=4 //extreme quality
+#if SUN_QUALITY>=4 
       return shadow_extreme_quality(tc.xyz/tc.w);
-#else //SUN_QUALITY<4
+#else 
 #ifdef SM_4_1
       return dx10_1_hw_hq_7x7(tc.xyz/tc.w);
-#else //SM_4_1
+#else 
       return dx10_0_hw_hq_7x7(tc);
-#endif //SM_4_1
-#endif //SUN_QUALITY==4
+#endif 
+#endif 
 }
-#else //	SM_MINMAX
-#if SUN_QUALITY>=4 //extreme quality
+#else 
+#if SUN_QUALITY>=4 
       return shadow_extreme_quality(tc.xyz/tc.w);
-#else //SUN_QUALITY<4
+#else 
 #ifdef SM_4_1
       return dx10_1_hw_hq_7x7(tc.xyz/tc.w);
-#else //SM_4_1
+#else 
       return dx10_0_hw_hq_7x7(tc);
-#endif //SM_4_1
-#endif //SUN_QUALITY==4
-#endif //	SM_MINMAX
+#endif 
+#endif 
+#endif 
 }
 
 float4 	test 		(float4 tc,float2 offset)
@@ -623,9 +622,9 @@ float4 	test 		(float4 tc,float2 offset)
 	return s_smap.SampleCmpLevelZero(smp_smap,tc.xy,tc.z).x;
 }
 
-half 	shadowtest_sun 	(float4 tc)			//jittered sampling
+half 	shadowtest_sun 	(float4 tc)			
 {
-	//	const 	float 	scale=(2.0f/float(SMAP_size));
+	
 	const 	float 	scale=(0.7f/float(SMAP_size));
 
 
@@ -641,7 +640,7 @@ half 	shadowtest_sun 	(float4 tc)			//jittered sampling
 	return	dot(r,1.h/4.h);
 }
 
-half 	shadow_high 	(float4 tc)			//jittered sampling
+half 	shadow_high 	(float4 tc)			
 {
 	float k=(0.5f/float(SMAP_size));
 
@@ -676,8 +675,8 @@ float shadow(float4 tc)
 		return shadow_hw_hq(tc);
 #	endif
 #else
-#	if SUN_QUALITY>=2 //Hight quality
-		//return shadowtest_sun 	(tc,float4(0,0,0,0));//jittered sampling;
+#	if SUN_QUALITY>=2 
+		
 		return shadow_hw		(tc);
 #	else
 		return shadow_hw		(tc);
@@ -693,9 +692,9 @@ float shadow_volumetric(float4 tc)
 
 #ifdef SM_MINMAX
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//hardware+PCF
-//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 float shadow_dx10_1(float4 tc)
 {
@@ -719,19 +718,19 @@ float shadow_dx10_1_sunshafts(float4 tc)
 #endif
 
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//testbed
 
-//uniform sampler2D	jitter0;
-//uniform sampler2D	jitter1;
-float 	shadowtest 	(float4 tc,float4 tcJ)				//jittered sampling
+
+
+
+
+float 	shadowtest 	(float4 tc,float4 tcJ)				
 {
 	float4	r;
 
 	const 	float 	scale=(2.7f/float(SMAP_size));
 
-//	float4	J0=tex2Dproj	(jitter0,tcJ)*scale;
-//	float4	J1=tex2Dproj	(jitter1,tcJ)*scale;
+
+
 	tcJ.xy	/=tcJ.w;
 	float4	J0=jitter0.Sample(smp_jitter,tcJ)*scale;
 	float4	J1=jitter1.Sample(smp_jitter,tcJ)*scale;
@@ -744,7 +743,7 @@ float 	shadowtest 	(float4 tc,float4 tcJ)				//jittered sampling
 	return	dot(r,1.h/4.h);
 }
 
-float 	shadow_rain 	(float4 tc,float2 tcJ)			//jittered sampling
+float 	shadow_rain 	(float4 tc,float2 tcJ)			
 {
 	float4	r;
 
@@ -760,18 +759,18 @@ float 	shadow_rain 	(float4 tc,float2 tcJ)			//jittered sampling
 	return	dot(r,1.h/4.h);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+
 #ifdef USE_SUNMASK	
-float3x4 m_sunmask;//ortho-projection
+float3x4 m_sunmask;
 float sunmask(float4 P)
 {
 	float2 		tc=mul(m_sunmask,P);
-	return 		s_lmap.Sample(smp_linear,tc).w;//A8 	
+	return 		s_lmap.Sample(smp_linear,tc).w;
 }
 #else
 float sunmask(){return 1.h;}
 #endif
-//////////////////////////////////////////////////////////////////////////////////////////
+
 uniform float4x4	m_shadow;
 
 #endif

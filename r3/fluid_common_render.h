@@ -189,24 +189,22 @@ float4 Raycast(PS_INPUT_RAYCAST input)
 
     
     float fSamples=(rayLength/gridScaleFactor*maxGridDim)*2.0;
-    int nSamples=floor(fSamples);
+    uint nSamples=floor(fSamples);
     float3 stepVec=normalize((rayOrigin-eyeOnGrid)*gridDim)*recGridDim*0.5;
    
     float3 O=rayOrigin+stepVec*Offset;
     
 #ifdef 	RENDER_FIRE
-    
     O+=fSamples*stepVec;
     stepVec=-stepVec;
 #endif	
 
-    for(int i=0;i<nSamples;i++)
+    for(uint i=0;i<nSamples;++i)
     {
         DoSample(1,O,color);
         O+=stepVec;
 
 #ifndef RENDER_FIRE
-    	
 	    if(color.a>0.99)
     	    break;
 #endif	

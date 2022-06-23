@@ -1,17 +1,17 @@
-//--------------------------------------------------------------------------------------
-//Gather pattern
-//--------------------------------------------------------------------------------------
 
-static float g_fHDAOZDispScale=0.1f;    //SSAO param
+
+
+
+static float g_fHDAOZDispScale=0.1f;    
 
 #ifdef USE_HDAO_CODE
 
-static float g_fSSAORejectRadius=0.43f;//SSAO param
-static float g_fSSAOIntensity   =0.85f;//SSAO param
-static float g_fSSAOAcceptRadius=0.0001f;//SSAO param
-static float g_fSSAOAcceptAngle =0.98f;//Used by the ValleyAngle function to determine shallow valleys
+static float g_fSSAORejectRadius=0.43f;
+static float g_fSSAOIntensity   =0.85f;
+static float g_fSSAOAcceptRadius=0.0001f;
+static float g_fSSAOAcceptAngle =0.98f;
 
-//Gather defines
+
 #define RING_0	(1)
 #define RING_1	(2)
 #define RING_2	(3)
@@ -51,20 +51,20 @@ static const int g_iNumRings 	=RING_0;
 static const int g_iNumNormals=0;
 #endif
 
-//Ring sample pattern
+
 static const float2 g_f2SSAORingPattern[NUM_RING_2_GATHERS]=
 {
-	//Ring 0
+	
 	{1,-1},
 	{0,1},
 	
-	//Ring 1
+	
 	{0,3},
 	{2,1},
 	{3,-1},
 	{1,-3},
 		
-	//Ring 2
+	
 	{1,-5},
 	{3,-3},
 	{5,-1},
@@ -73,20 +73,20 @@ static const float2 g_f2SSAORingPattern[NUM_RING_2_GATHERS]=
 	{0,5},
 };
 
-//Ring weights
+
 static const float4 g_f4SSAORingWeight[NUM_RING_2_GATHERS]=
 {
-	//Ring 0 (Sum=5.30864)
+	
 	{1.00000,0.50000,0.44721,0.70711},
 	{0.50000,0.44721,0.70711,1.00000},
 	
-	//Ring 1 (Sum=6.08746)
+	
 	{0.30000,0.29104,0.37947,0.40000},
 	{0.42426,0.33282,0.37947,0.53666},
 	{0.40000,0.30000,0.29104,0.37947},
 	{0.53666,0.42426,0.33282,0.37947},
 	
-	//Ring 2 (Sum=6.53067)
+	
 	{0.31530,0.29069,0.24140,0.25495},
 	{0.36056,0.29069,0.26000,0.30641},
 	{0.26000,0.21667,0.21372,0.25495},
@@ -102,9 +102,9 @@ static const float g_fRingWeightsTotal[RING_2]=
 	17.92677,
 };
 
-//----------------------------------------------------------------------------------------
-//Helper function to Gather samples in 10.1 and 10.0 modes 
-//----------------------------------------------------------------------------------------
+
+
+
 
 float4 GatherZSamples(float2 f2TexCoord)
 {
@@ -117,16 +117,16 @@ float4 GatherZSamples(float2 f2TexCoord)
 	f4Ret.y=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),MSAA_SAMPLE_INDEX,int2(1,1)).z;
 	f4Ret.z=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),MSAA_SAMPLE_INDEX,int2(0,1)).z;
 	f4Ret.w=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),MSAA_SAMPLE_INDEX,int2(0,0)).z;
-#else  //!USE_MSAA
+#else  
 #ifndef SM_5
 	f4Ret.x=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),int2(1,0)).z;
 	f4Ret.y=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),int2(1,1)).z;
 	f4Ret.z=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),int2(0,1)).z;
 	f4Ret.w=g_txDepth.Load(int3(f2TexCoord*g_f2RTSize,0),int2(0,0)).z;
-#else //!SM_5
+#else 
 	f4Ret=g_txDepth.GatherBlue(smp_nofilter,f2TexCoord);
-#endif //SM_5
-#endif //USE_MSAA
+#endif 
+#endif 
 
 #ifdef USE_MSAA
     #ifdef GBUFFER_OPTIMIZATION
@@ -140,7 +140,7 @@ float4 GatherZSamples(float2 f2TexCoord)
 	f4Ret.z+=g_fHDAOZDispScale*g_txNormal.Load(int3(f2TexCoord*g_f2RTSize,0),MSAA_SAMPLE_INDEX,int2(0,1)).z;
 	f4Ret.w+=g_fHDAOZDispScale*g_txNormal.Load(int3(f2TexCoord*g_f2RTSize,0),MSAA_SAMPLE_INDEX,int2(0,0)).z;
 	#endif
-#else  //!USE_MSAA
+#else  
 #ifndef SM_5
     #ifdef GBUFFER_OPTIMIZATION
 	f4Ret.x+=g_fHDAOZDispScale*g_txNormal.Load(int3(f2TexCoord*g_f2RTSize,0),int2(1,0)).x;
@@ -153,19 +153,19 @@ float4 GatherZSamples(float2 f2TexCoord)
 	f4Ret.z+=g_fHDAOZDispScale*g_txNormal.Load(int3(f2TexCoord*g_f2RTSize,0),int2(0,1)).z;
 	f4Ret.w+=g_fHDAOZDispScale*g_txNormal.Load(int3(f2TexCoord*g_f2RTSize,0),int2(0,0)).z;
 	#endif
-#else //!SM_5
+#else 
     #ifdef GBUFFER_OPTIMIZATION
 	f4Ret+=g_fHDAOZDispScale*g_txNormal.GatherRed(smp_nofilter,f2TexCoord);
 	#else
 	f4Ret+=g_fHDAOZDispScale*g_txNormal.GatherBlue(smp_nofilter,f2TexCoord);
 	#endif
-#endif //SM_5
-#endif //USE_MSAA
+#endif 
+#endif 
       
 	return f4Ret;
 }
 
-//Used by the valley angle function
+
 #define NUM_NORMAL_LOADS (4)
 static const int2 g_i2HDAONormalLoadPattern[4]=
 {
@@ -176,9 +176,9 @@ static const int2 g_i2HDAONormalLoadPattern[4]=
 };
 
 #ifdef SSAO_QUALITY
-//=================================================================================================================================
-//Computes the general valley angle
-//=================================================================================================================================
+
+
+
 float HDAOValleyAngle(uint2 u2ScreenCoord)
 {
 	float3 f3N1;
@@ -195,13 +195,13 @@ float HDAOValleyAngle(uint2 u2ScreenCoord)
 	float3 N=g_txNormal.Load(int3(u2ScreenCoord,0),MSAA_SAMPLE_INDEX).xyz;
 #endif
 
-	for(int iNormal=0;iNormal<NUM_NORMAL_LOADS;iNormal++)
+	for(uint iNormal=0;iNormal<NUM_NORMAL_LOADS;++iNormal)
 	{
 		i2MirrorPattern=g_i2HDAONormalLoadPattern[iNormal]*int2(-1,-1);
 		i2OffsetScreenCoord=u2ScreenCoord+g_i2HDAONormalLoadPattern[iNormal];
 		i2MirrorOffsetScreenCoord=u2ScreenCoord+i2MirrorPattern;
 		
-		//Clamp our test to screen coordinates
+		
 		i2OffsetScreenCoord=(i2OffsetScreenCoord>(g_f2RTSize-float2(1.0f,1.0f)))?(g_f2RTSize-float2(1.0f,1.0f)):(i2OffsetScreenCoord);
 		i2MirrorOffsetScreenCoord=(i2MirrorOffsetScreenCoord>(g_f2RTSize-float2(1.0f,1.0f)))?(g_f2RTSize-float2(1.0f,1.0f)):(i2MirrorOffsetScreenCoord);
 		i2OffsetScreenCoord=(i2OffsetScreenCoord<0)?(0):(i2OffsetScreenCoord);
@@ -254,10 +254,10 @@ float	calc_hdao(float3 P,float3 N,float2 tc,float2 tcJ,uint iSample)
 	float4 f4Occlusion=0.0f;
 	float2 f2ScreenCoord=tc*(g_f2RTSize.xy);
 
-	//Get the general valley angle,to scale the result by 
+	
 	float fDot=HDAOValleyAngle(int2(f2ScreenCoord));
 	
-	//For Gather we need to snap the screen coords
+	
 #ifndef USE_MSAA
 #ifdef SM_4_1
 	f2ScreenCoord=int2(f2ScreenCoord);
@@ -265,11 +265,11 @@ float	calc_hdao(float3 P,float3 N,float2 tc,float2 tcJ,uint iSample)
 #endif
 
 	{
-		//Compute integer screen coord,and store off the inverse of the RT Size
+		
 		float2 f2InvRTSize	=(1.0f).xx/(g_f2RTSize.xy);
 		float ZDisp=P.z+g_fHDAOZDispScale*N.z;
-		//Loop through each gather location,and compare with its mirrored location
-		[unroll]for(int iGather=0;iGather<g_iNumRingGathers;++iGather)
+		
+		[unroll]for(uint iGather=0;iGather<g_iNumRingGathers;++iGather)
 		{
 			float2 f2MirrorScreenCoord=(g_f2SSAORingPattern[iGather]+float2(1.0f,1.0f))*float2(-1.0f,-1.0f);
 			

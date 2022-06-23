@@ -15,7 +15,7 @@ float ssao_blur_ps(float2 centerTC)
 float ssao_blur_ps(int2 centerTC,int iSample)
 #endif
 {
-  //low weight center sample-will be used on edges
+  
 	float  fSumWeight=0.025f;
 #ifndef USE_MSAA
    float2 centerData=s_occ.Sample(smp_nofilter,centerTC);
@@ -45,7 +45,7 @@ float ssao_blur_ps(int2 centerTC,int iSample)
 #endif
 
   [unroll]
-  for(int i=0;i<4;i++)
+  for(uint i=0;i<4;++i)
   {
 #ifndef USE_MSAA
      float2 sampleTC=centerTC+pos_decompression_params2.zw*arrOffsets[i];
@@ -68,40 +68,40 @@ float ssao_blur_ps(int2 centerTC,int iSample)
 
   return fOcclusion;
 }
-//#else
-//float ssao_blur_ps(int3 centertc,int isample)
-//{
-  ////low weight center sample-will be used on edges
-   //float  fSumWeight=10*0.0125f;
-   //float2 centerData=s_occ.Load(centerTC,iSample);
 
-   //float  cColor=centerData.r*fSumWeight;
-   //float  centerDepth=centerData.g;
+
+
+  
+   
+   
+
+   
+   
 	
-   //int3 arrOffsets[4]=
-   //{
-     //int3(1,-1,0),
-     //int3(-1,-1,0),
-     //int3(1,1,0),
-     //int3(-1,1,0)
-   //};
+   
+   
+     
+     
+     
+     
+   
 
-  //for(int i=0;i<4;i++)
-  //{
-     //int3 sampleTC=centerTC+arrOffsets[i];
-     //float2 sampleData=s_occ.Load(sampleTC,iSample);
+  
+  
+     
+     
 	 
-     //float fDepth=sampleData.g;
-     //float fDiff=8.f*(1.f-fDepth/centerDepth);
-     //float fWeight=saturate(0.5f-0.75f*abs(fDiff)-0.25f*(fDiff));
+     
+     
+     
 
-     //cColor+=sampleData.r*fWeight;
+     
 
-     //fSumWeight+=fWeight;
-  //}
+     
+  
 
-   //cColor/=fSumWeight;
+   
 
-  //return cColor;
-//}
-//#endif
+  
+
+

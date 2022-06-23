@@ -1,17 +1,17 @@
-//--------------------------------------------------------------------------------------
-//Gather pattern
-//--------------------------------------------------------------------------------------
 
-//=================================================================================================================================
-//The constant buffer
-//=================================================================================================================================
+
+
+
+
+
+
 
 
 #define  g_f2RTSize (pos_decompression_params2.xy)
 
-//=================================================================================================================================
-//Textures,Buffers & Samplers
-//=================================================================================================================================
+
+
+
 
 #if (MSAA_SAMPLES==2)
 
@@ -32,7 +32,7 @@
 #endif
 
 #ifdef SM_5_0
-//CS Output buffers
+
 RWTexture2D<float>g_ResultTexture:register(u0);
 #endif
 
@@ -44,40 +44,40 @@ RWTexture2D<float>g_ResultTexture:register(u0);
 #define g_txNormal s_normal
 #endif
 
-//Samplers
+
 #define g_SamplePoint smp_nofilter
 
-//=================================================================================================================================
-//Hard coded HDAO params
-//=================================================================================================================================
 
-static float g_fHDAORejectRadius=0.43f;//Camera Z values must fall within the reject and accept radius to be 
-static float g_fHDAOAcceptRadius=0.0001f;//considered as a valley
-static float g_fHDAOIntensity =0.5f;    //Simple scaling factor to control the intensity of the occlusion
-static float g_fHDAONormalScale=0.10f;//Scaling factor to control the effect the normals have 
 
-//=================================================================================================================================
-//Thread/Group Defines
-//=================================================================================================================================
 
-//Group Defines
+
+static float g_fHDAORejectRadius=0.43f;
+static float g_fHDAOAcceptRadius=0.0001f;
+static float g_fHDAOIntensity =0.5f;    
+static float g_fHDAONormalScale=0.10f;
+
+
+
+
+
+
 #define GROUP_TEXEL_DIM			(56)
-#define GROUP_THREAD_DIM		(32)//32*32=1024 threads 
+#define GROUP_THREAD_DIM		(32)
 #define GROUP_TEXEL_OVERLAP		(12)
 
-//Texture Op Defines
+
 #define GATHER_THREADS			(784)
 #define GATHER_THREADS_PER_ROW	(28)
 #define GATHER_PER_THREAD		(1)
 
-//ALU Op Defines
+
 #define ALU_DIM				    (32)
 
 #ifdef SM_5_0
 
-    //=============================================================================================================================
-    //Group shared memory (LDS)
-    //=============================================================================================================================
+    
+    
+    
 
     groupshared struct
     {
@@ -85,21 +85,21 @@ static float g_fHDAONormalScale=0.10f;//Scaling factor to control the effect the
 }g_LDS;
 
 
-    //=============================================================================================================================
-    //Helper function to load data from the LDS,given texel coord
-    //NOTE:X and Y are swapped around to ensure horizonatal reading across threads,this avoids
-    //LDS memory bank conflicts
-    //=============================================================================================================================
+    
+    
+    
+    
+    
     float LoadFromLDS(uint2 u2Texel)
     {
 	    return g_LDS.fCameraZ[u2Texel.y][u2Texel.x];
 }
 
-    //=============================================================================================================================
-    //Helper function to store data to the LDS,given texel coord
-    //NOTE:X and Y are swapped around to ensure horizonatal wrting across threads,this avoids
-    //LDS memory bank conflicts
-    //=============================================================================================================================
+    
+    
+    
+    
+    
     void StoreToLDS(float fValue,uint2 u2Texel)
     {
 	    g_LDS.fCameraZ[u2Texel.y][u2Texel.x]=fValue;
@@ -108,9 +108,9 @@ static float g_fHDAONormalScale=0.10f;//Scaling factor to control the effect the
 #endif
 
 
-//=================================================================================================================================
-//HDAO sample pattern
-//=================================================================================================================================
+
+
+
 
 #if SSAO_QUALITY>=3
 
@@ -224,7 +224,7 @@ static float g_fHDAONormalScale=0.10f;//Scaling factor to control the effect the
 #endif
 
 
-//Used by the valley angle function
+
 #define NUM_NORMAL_LOADS (4)
 static const int2 g_i2NormalLoadPattern[4]=
 {
@@ -235,9 +235,9 @@ static const int2 g_i2NormalLoadPattern[4]=
 };
 
 #if SSAO_QUALITY>=3
-//=================================================================================================================================
-//Computes the general valley angle
-//=================================================================================================================================
+
+
+
 float ValleyAngle(uint2 u2ScreenCoord)
 {
 	float fSummedDot=0.0f;
@@ -248,13 +248,13 @@ float ValleyAngle(uint2 u2ScreenCoord)
 	float3 N=g_txNormal.Load(int3(u2ScreenCoord,0),MSAA_SAMPLE_INDEX).xyz;
 	#endif
 
-	for(int iNormal=0;iNormal<NUM_NORMAL_LOADS;iNormal++)
+	for(uint iNormal=0;iNormal<NUM_NORMAL_LOADS;++iNormal)
 	{
 		int2 i2MirrorPattern=g_i2NormalLoadPattern[iNormal]*int2(-1,-1);
 		int2 i2OffsetScreenCoord=u2ScreenCoord+g_i2NormalLoadPattern[iNormal];
 		int2 i2MirrorOffsetScreenCoord=u2ScreenCoord+i2MirrorPattern;
 		
-		//Clamp our test to screen coordinates
+		
 		i2OffsetScreenCoord=(i2OffsetScreenCoord>(g_f2RTSize-float2(1.0f,1.0f)))?(g_f2RTSize-float2(1.0f,1.0f)):(i2OffsetScreenCoord);
 		i2MirrorOffsetScreenCoord=(i2MirrorOffsetScreenCoord>(g_f2RTSize-float2(1.0f,1.0f)))?(g_f2RTSize-float2(1.0f,1.0f)):(i2MirrorOffsetScreenCoord);
 		i2OffsetScreenCoord=(i2OffsetScreenCoord<0)?(0):(i2OffsetScreenCoord);
@@ -293,29 +293,29 @@ float ValleyAngle(uint2 u2ScreenCoord)
     float ComputeHDAO(uint2 u2CenterTexel,uint2 u2ScreenPos)
     {
 	    float fOcclusion=0.0f;
-	    //Get the general valley angle,to scale the result by 
+	    
 	    float fDot=ValleyAngle(u2ScreenPos);
-	    //Sample center texel
+	    
 	    float fCenterZ=LoadFromLDS(u2CenterTexel);
 		float2 f2SampledZ;
-	    //Loop through each valley
+	    
 	    [unroll]
-        for(uint uValley=0;uValley<NUM_VALLEYS;uValley++)
+        for(uint uValley=0;uValley<NUM_VALLEYS;++uValley)
 	    {
-		    //Sample
+		    
 		    f2SampledZ.x=LoadFromLDS(u2CenterTexel+g_i2HDAOSamplePattern[uValley]);
 		    f2SampledZ.y=LoadFromLDS(u2CenterTexel-g_i2HDAOSamplePattern[uValley]);
     		
-		    //Valley detect
+		    
 		    float2 f2Diff=fCenterZ.xx-f2SampledZ;
 		    float2 f2Compare=(f2Diff<g_fHDAORejectRadius.xx)?(1.0f):(0.0f);
 		    f2Compare*=(f2Diff>g_fHDAOAcceptRadius.xx)?(1.0f):(0.0f);
     		
-		    //Weight occlusion
+		    
 		    fOcclusion+=(f2Compare.x*f2Compare.y*g_fHDAOSampleWeights[uValley]);
 	}
     	
-	    //Finally calculate the HDAO occlusion value
+	    
 	    fOcclusion/=g_fWeightTotal;
 	    fOcclusion*=g_fHDAOIntensity*fDot;
 	    fOcclusion*=fCenterZ<0.5f?0.0f:lerp(0.0f,1.0f,saturate(fCenterZ-0.5f));
@@ -325,33 +325,33 @@ float ValleyAngle(uint2 u2ScreenCoord)
 }
 #endif
 
-    //=============================================================================================================================
-    //HDAO CS:Performs valley detection in Camera Z space,and offsets by the Z 
-    //component of the camera space normal
-    //=============================================================================================================================
+    
+    
+    
+    
     [numthreads(GROUP_THREAD_DIM,GROUP_THREAD_DIM,1)]
     void main(uint3 Gid:SV_GroupID,uint3 GTid:SV_GroupThreadID,uint GI:SV_GroupIndex)
     #ifndef	SSAO_QUALITY
     {
-        //Calculate the screen pos
+        
 	    uint2 u2ScreenPos=uint2(Gid.x*ALU_DIM+GTid.x,Gid.y*ALU_DIM+GTid.y);
     		
-	    //Make sure we don't write outside the target buffer
+	    
 	    if((u2ScreenPos.x<uint(g_f2RTSize.x))&& (u2ScreenPos.y<uint(g_f2RTSize.y)))
 	    {
-            //Write the data directly to an AO texture:
+            
             g_ResultTexture[u2ScreenPos.xy]=1.0f;
    }
 }
     #elif SSAO_QUALITY<3
     {
-        //Calculate the screen pos
+        
 	    uint2 u2ScreenPos=uint2(Gid.x*ALU_DIM+GTid.x,Gid.y*ALU_DIM+GTid.y);
     		
-	    //Make sure we don't write outside the target buffer
+	    
 	    if((u2ScreenPos.x<uint(g_f2RTSize.x))&& (u2ScreenPos.y<uint(g_f2RTSize.y)))
 	    {
-            //Write the data directly to an AO texture:
+            
             g_ResultTexture[u2ScreenPos.xy]=1.0f;
    }
 }
@@ -359,19 +359,19 @@ float ValleyAngle(uint2 u2ScreenCoord)
     {
 	    if(GI<GATHER_THREADS)
 	    {
-		    //Get the screen position for this threads TEX ops
+		    
 		    uint uColumn=(GI % GATHER_THREADS_PER_ROW)*GATHER_PER_THREAD*2;
 		    uint uRow=(GI/GATHER_THREADS_PER_ROW)*2;
 		    float2 f2ScreenCoord=float2((float2(Gid.x,Gid.y)*float2(ALU_DIM,ALU_DIM))-float2(GROUP_TEXEL_OVERLAP,GROUP_TEXEL_OVERLAP))+float2(uColumn,uRow);
 		    
             #ifndef USE_MSAA
-                //Offset for the use of gather4
+                
                 f2ScreenCoord+=float2(1.0f,1.0f);
 				float2 f2InvTextureSize=1.0f/g_f2RTSize;
             #endif
-		    //Gather from input textures and lay down in the LDS
+		    
 		    [unroll] 
-            for(uint uGather=0;uGather<GATHER_PER_THREAD;uGather++)
+            for(uint uGather=0;uGather<GATHER_PER_THREAD;++uGather)
 		    {
 			    #ifdef USE_MSAA
 
@@ -415,16 +415,16 @@ float ValleyAngle(uint2 u2ScreenCoord)
        	}
 	}
     	    
-	    //Enforce a group barrier with sync
+	    
 	    GroupMemoryBarrierWithGroupSync();
     	
-        //Calculate the screen pos
+        
 	    uint2 u2ScreenPos=uint2(Gid.x*ALU_DIM+GTid.x,Gid.y*ALU_DIM+GTid.y);
     		
-	    //Make sure we don't write outside the target buffer
+	    
 	    if((u2ScreenPos.x<uint(g_f2RTSize.x))&& (u2ScreenPos.y<uint(g_f2RTSize.y)))
 	    {
-            //Write the data directly to an AO texture:
+            
             g_ResultTexture[u2ScreenPos.xy]=ComputeHDAO(uint2(GTid.x+GROUP_TEXEL_OVERLAP,GTid.y+GROUP_TEXEL_OVERLAP),u2ScreenPos);
    }
 }
@@ -433,10 +433,10 @@ float ValleyAngle(uint2 u2ScreenCoord)
 
 #else
 
-//=================================================================================================================================
-//HDAO PS:Performs valley detection in Camera Z space,and offsets by the Z 
-//component of the camera space normal
-//=================================================================================================================================
+
+
+
+
 float	calc_new_hdao(float3 P,float3 N,float2 tc)
 #ifndef	SSAO_QUALITY
 {
@@ -444,18 +444,18 @@ float	calc_new_hdao(float3 P,float3 N,float2 tc)
 }
 #elif SSAO_QUALITY>=3
 {
-	//Locals
+	
 	uint2 u2CenterScreenCoord;
 	float2 f2SampledZ, f2Diff, f2Compare;
 	float fOcclusion=0.0f;
 
-	//Compute screen coord,and store off the inverse of the RT Size
+	
 	u2CenterScreenCoord=uint2(floor(tc*g_f2RTSize));
 	
-	//Get the general valley angle,to scale the result by 
+	
 	float fDot=ValleyAngle(u2CenterScreenCoord);
 
-	//Sample center texel,convert to camera space and add normal
+	
 	float fDepth=g_txDepth.Load(int3(u2CenterScreenCoord,0),MSAA_SAMPLE_INDEX).z;
     #ifdef GBUFFER_OPTIMIZATION
         float fCenterZ=fDepth+(g_txNormal.Load(int3(u2CenterScreenCoord,0),MSAA_SAMPLE_INDEX).x*g_fHDAONormalScale);
@@ -463,14 +463,14 @@ float	calc_new_hdao(float3 P,float3 N,float2 tc)
         float fCenterZ=fDepth+(g_txNormal.Load(int3(u2CenterScreenCoord,0),MSAA_SAMPLE_INDEX).z*g_fHDAONormalScale);
     #endif
 	
-	//Loop through each valley
-	for(int iValley=0;iValley<NUM_VALLEYS;iValley++)
+	
+	for(uint iValley=0;iValley<NUM_VALLEYS;++iValley)
 	{
-		//Sample depth & convert to camera space
+		
         f2SampledZ.x=g_txDepth.Load(int3((u2CenterScreenCoord+g_i2HDAOSamplePattern[iValley]),0),MSAA_SAMPLE_INDEX).z;
 		f2SampledZ.y=g_txDepth.Load(int3((u2CenterScreenCoord-g_i2HDAOSamplePattern[iValley]),0),MSAA_SAMPLE_INDEX).z;
 
-        //Sample normal and do a scaled add
+        
         #ifdef GBUFFER_OPTIMIZATION
 	        f2SampledZ.x+=(g_txNormal.Load(int3((u2CenterScreenCoord+g_i2HDAOSamplePattern[iValley]),0),MSAA_SAMPLE_INDEX).x*g_fHDAONormalScale);
 	        f2SampledZ.y+=(g_txNormal.Load(int3((u2CenterScreenCoord-g_i2HDAOSamplePattern[iValley]),0),MSAA_SAMPLE_INDEX).x*g_fHDAONormalScale);
@@ -479,16 +479,16 @@ float	calc_new_hdao(float3 P,float3 N,float2 tc)
 	        f2SampledZ.y+=(g_txNormal.Load(int3((u2CenterScreenCoord-g_i2HDAOSamplePattern[iValley]),0),MSAA_SAMPLE_INDEX).z*g_fHDAONormalScale);
 	    #endif
 
-		//Detect valleys 
+		
 		f2Diff=fCenterZ.xx-f2SampledZ;
 		f2Compare=(f2Diff<g_fHDAORejectRadius.xx)?(1.0f):(0.0f);
 		f2Compare*=(f2Diff>g_fHDAOAcceptRadius.xx)?(1.0f):(0.0f);
 						
-		//Accumulate weighted occlusion
+		
 		fOcclusion+=f2Compare.x*f2Compare.y*g_fHDAOSampleWeights[iValley];
 }
 					
-	//Finally calculate the HDAO occlusion value
+	
 	fOcclusion/=g_fWeightTotal;
 	fOcclusion*=g_fHDAOIntensity*fDot;
 	fOcclusion*=fCenterZ<0.5f?0.0f:lerp(0.0f,1.0f,saturate(fCenterZ-0.5f));

@@ -1,15 +1,6 @@
 #ifndef	common_iostructs_h_included
 #define	common_iostructs_h_included
 
-////////////////////////////////////////////////////////////////
-//	This file contains io structs:
-//	v_name	:	input for vertex shader.
-//	v2p_name:	output for vertex shader.
-//	p_name	:	input for pixel shader.
-////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////
-//	TL0uv
 struct	v_TL0uv_positiont
 {
 	float4	P		:POSITIONT;
@@ -25,17 +16,15 @@ struct	v_TL0uv
 struct	v2p_TL0uv
 {
 	float4	Color	:COLOR;
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_TL0uv
 {
 	float4	Color	:COLOR;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
 
-////////////////////////////////////////////////////////////////
-//	TL
 struct	v_TL_positiont
 {
 	float4	P		:POSITIONT;
@@ -54,18 +43,18 @@ struct	v2p_TL
 {
 	float2 	Tex0	:TEXCOORD0;
 	float4	Color	:COLOR;
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_TL
 {
 	float2 	Tex0	:TEXCOORD0;
 	float4	Color	:COLOR;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
 
-////////////////////////////////////////////////////////////////
-//	TL2uv
+
+
 struct	v_TL2uv
 {
 	float4	P		:POSITIONT;
@@ -79,7 +68,7 @@ struct	v2p_TL2uv
 	float2 	Tex0	:TEXCOORD0;
 	float2	Tex1	:TEXCOORD1;
 	float4	Color	:COLOR;
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_TL2uv
@@ -87,41 +76,40 @@ struct	p_TL2uv
 	float2 	Tex0	:TEXCOORD0;
 	float2	Tex1	:TEXCOORD1;
 	float4	Color	:COLOR;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
-////////////////////////////////////////////////////////////////
-//	postpr
+
 struct	v_postpr
 {
 	float4	P		:POSITIONT;
-	float2 	Tex0	:TEXCOORD0;//base1 (duality)	
-	float2	Tex1	:TEXCOORD1;//base2 (duality)
-	float2	Tex2	:TEXCOORD2;//base  (noise)
-	float4	Color	:COLOR0;//multiplier,color.w=noise_amount
-	float4	Gray	:COLOR1;//(.3,.3,.3.,amount)
+	float2 	Tex0	:TEXCOORD0;
+	float2	Tex1	:TEXCOORD1;
+	float2	Tex2	:TEXCOORD2;
+	float4	Color	:COLOR0;
+	float4	Gray	:COLOR1;
 };
 
 struct	v2p_postpr
 {
-	float2 	Tex0	:TEXCOORD0;//base1 (duality)	
-	float2	Tex1	:TEXCOORD1;//base2 (duality)
-	float2	Tex2	:TEXCOORD2;//base  (noise)
-	float4	Color	:COLOR0;//multiplier,color.w=noise_amount
-	float4	Gray	:COLOR1;//(.3,.3,.3.,amount)
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float2 	Tex0	:TEXCOORD0;
+	float2	Tex1	:TEXCOORD1;
+	float2	Tex2	:TEXCOORD2;
+	float4	Color	:COLOR0;
+	float4	Gray	:COLOR1;
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_postpr
 {
-	float2 	Tex0	:TEXCOORD0;//base1 (duality)	
-	float2	Tex1	:TEXCOORD1;//base2 (duality)
-	float2	Tex2	:TEXCOORD2;//base  (noise)
-	float4	Color	:COLOR0;//multiplier,color.w=noise_amount
-	float4	Gray	:COLOR1;//(.3,.3,.3.,amount)
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float2 	Tex0	:TEXCOORD0;
+	float2	Tex1	:TEXCOORD1;
+	float2	Tex2	:TEXCOORD2;
+	float4	Color	:COLOR0;
+	float4	Gray	:COLOR1;
+
 };
-////////////////////////////////////////////////////////////////
-//	build	(bloom_build)
+
+
 struct	v_build
 {
 	float4	P		:POSITIONT;
@@ -137,7 +125,7 @@ struct	v2p_build
 	float2	Tex1	:TEXCOORD1;
 	float2 	Tex2	:TEXCOORD2;
 	float2	Tex3	:TEXCOORD3;
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_build
@@ -146,10 +134,10 @@ struct	p_build
 	float2	Tex1	:TEXCOORD1;
 	float2 	Tex2	:TEXCOORD2;
 	float2	Tex3	:TEXCOORD3;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
-////////////////////////////////////////////////////////////////
-//	filter	(bloom_filter)
+
+
 struct	v_filter
 {
 	float4	P		:POSITIONT;
@@ -173,7 +161,7 @@ struct	v2p_filter
 	float4	Tex5	:TEXCOORD5;
 	float4 	Tex6	:TEXCOORD6;
 	float4	Tex7	:TEXCOORD7;
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_filter
@@ -186,11 +174,11 @@ struct	p_filter
 	float4	Tex5	:TEXCOORD5;
 	float4 	Tex6	:TEXCOORD6;
 	float4	Tex7	:TEXCOORD7;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
 
-////////////////////////////////////////////////////////////////
-//	aa_AA
+
+
 struct	v_aa_AA
 {
 	float4 P		:POSITIONT;
@@ -212,7 +200,7 @@ struct	v2p_aa_AA
 	float2	Tex4	:TEXCOORD4;
 	float4	Tex5	:TEXCOORD5;
 	float4	Tex6	:TEXCOORD6;
-	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	HPos	:SV_Position;
 };
 
 struct	p_aa_AA
@@ -224,7 +212,7 @@ struct	p_aa_AA
 	float2	Tex4	:TEXCOORD4;
 	float4	Tex5	:TEXCOORD5;
 	float4	Tex6	:TEXCOORD6;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
 
 struct	p_aa_AA_sun
@@ -235,30 +223,30 @@ struct	p_aa_AA_sun
 	float2	RT		:TEXCOORD3;
 	float2	LB		:TEXCOORD4;
 	float2	RB		:TEXCOORD5;
-//	float4 	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
 
-////////////////////////////////////////////////////////////////
-//	dumb
+
+
 struct 	v_dumb
 {
-	float4	P		:POSITION;//Clip-space position 	(for rasterization)
+	float4	P		:POSITION;
 };
 
 struct 	v2p_dumb
 {
-	float4	HPos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4	HPos	:SV_Position;
 };
 
-////////////////////////////////////////////////////////////////
-//	Volume
+
+
 struct 	v2p_volume
 {
 	float4 	tc		:TEXCOORD0;
 #ifdef 	USE_SJITTER
 	float4 	tcJ		:TEXCOORD1;
 #endif
-	float4 	hpos	:SV_Position;//Clip-space position 	(for rasterization)
+	float4 	hpos	:SV_Position;
 };
 struct 	p_volume
 {
@@ -266,44 +254,44 @@ struct 	p_volume
 #ifdef 	USE_SJITTER
 	float4 	tcJ		:TEXCOORD1;
 #endif
-//	float4 	hpos	:SV_Position;//Clip-space position 	(for rasterization)
+
 };
-////////////////////////////////////////////////////////////////
-//	Static
+
+
 struct         v_static
 {
-	float4	Nh		:NORMAL;//(nx,ny,nz,hemi occlusion)
-	float4	T		:TANGENT;//tangent
-	float4	B		:BINORMAL;//binormal
-	int2	tc		:TEXCOORD0;//(u,v)
+	float4	Nh		:NORMAL;
+	float4	T		:TANGENT;
+	float4	B		:BINORMAL;
+	int2	tc		:TEXCOORD0;
 #ifdef USE_LM_HEMI
-	int2	lmh		:TEXCOORD1;//(lmu,lmv)
+	int2	lmh		:TEXCOORD1;
 #endif
-//	float4	color	:COLOR0;//(r,g,b,dir-occlusion)	//	Swizzle before use!!!
-	float4	P		:POSITION;//(float,float,float,1)
+
+	float4	P		:POSITION;
 };
 
 struct	v_static_color
 {
-	float4	Nh		:NORMAL;//(nx,ny,nz,hemi occlusion)
-	float4	T		:TANGENT;//tangent
-	float4	B		:BINORMAL;//binormal
-	int2	tc		:TEXCOORD0;//(u,v)
+	float4	Nh		:NORMAL;
+	float4	T		:TANGENT;
+	float4	B		:BINORMAL;
+	int2	tc		:TEXCOORD0;
 #ifdef USE_LM_HEMI
-	int2	lmh		:TEXCOORD1;//(lmu,lmv)
+	int2	lmh		:TEXCOORD1;
 #endif
-	float4	color	:COLOR0;//(r,g,b,dir-occlusion)	//	Swizzle before use!!!
-	float4	P		:POSITION;//(float,float,float,1)
+	float4	color	:COLOR0;
+	float4	P		:POSITION;
 };
 
-////////////////////////////////////////////////////////////////
-//	defer
+
+
 #ifndef GBUFFER_OPTIMIZATION
 struct                  f_deffer        		
 {
-	float4	position:SV_Target0;//px,py,pz,m-id
-	float4	Ne		 :SV_Target1;//nx,ny,nz,hemi
-	float4	C		 :SV_Target2;//r,g,b,gloss
+	float4	position:SV_Target0;
+	float4	Ne		 :SV_Target1;
+	float4	C		 :SV_Target2;
 #ifdef EXTEND_F_DEFFER
    uint     mask   :SV_COVERAGE;
 #endif
@@ -311,8 +299,8 @@ struct                  f_deffer
 #else
 struct                  f_deffer        		
 {
-	float4	position:SV_Target0;//xy=encoded normal,z=pz,w=encoded(m-id,hemi)
-	float4	C		 :SV_Target1;//r,g,b,gloss
+	float4	position:SV_Target0;
+	float4	C		 :SV_Target1;
 #ifdef EXTEND_F_DEFFER
    uint     mask   :SV_COVERAGE;
 #endif
@@ -321,32 +309,32 @@ struct                  f_deffer
 
 struct					gbuffer_data
 {
-	float3  P;//position.(mtl or sun)
-	float   mtl;//material id
-	float3  N;//normal
-	float   hemi;//AO
+	float3  P;
+	float   mtl;
+	float3  N;
+	float   hemi;
 	float3  C;
 	float   gloss;
 };
 
-////////////////////////////////////////////////////////////////
-//	Defer bumped
+
+
 struct v2p_bumped
 {
 #if defined(USE_R2_STATIC_SUN)&& !defined(USE_LM_HEMI)
-	float4	tcdh	:TEXCOORD0;//Texture coordinates,     w=sun_occlusion
+	float4	tcdh	:TEXCOORD0;
 #else
-	float2	tcdh	:TEXCOORD0;//Texture coordinates
+	float2	tcdh	:TEXCOORD0;
 #endif
-	float4	position:TEXCOORD1;//position+hemi
-	float3	M1		:TEXCOORD2;//nmap 2 eye-1
-	float3	M2		:TEXCOORD3;//nmap 2 eye-2
-	float3	M3		:TEXCOORD4;//nmap 2 eye-3
+	float4	position:TEXCOORD1;
+	float3	M1		:TEXCOORD2;
+	float3	M2		:TEXCOORD3;
+	float3	M3		:TEXCOORD4;
 #ifdef USE_TDETAIL
-	float2	tcdbump	:TEXCOORD5;//d-bump
+	float2	tcdbump	:TEXCOORD5;
 #endif
 #ifdef USE_LM_HEMI
-		float2	lmh	:TEXCOORD6;//lm-hemi
+		float2	lmh	:TEXCOORD6;
 #endif
 	float4	hpos	:SV_Position;
 };
@@ -354,37 +342,37 @@ struct v2p_bumped
 struct p_bumped
 {
 #if defined(USE_R2_STATIC_SUN)&& !defined(USE_LM_HEMI)
-	float4	tcdh	:TEXCOORD0;//Texture coordinates,     w=sun_occlusion
+	float4	tcdh	:TEXCOORD0;
 #else
-	float2	tcdh	:TEXCOORD0;//Texture coordinates
+	float2	tcdh	:TEXCOORD0;
 #endif
-	float4	position:TEXCOORD1;//position+hemi
-	float3	M1		:TEXCOORD2;//nmap 2 eye-1
-	float3	M2		:TEXCOORD3;//nmap 2 eye-2
-	float3	M3		:TEXCOORD4;//nmap 2 eye-3
+	float4	position:TEXCOORD1;
+	float3	M1		:TEXCOORD2;
+	float3	M2		:TEXCOORD3;
+	float3	M3		:TEXCOORD4;
 #ifdef USE_TDETAIL
-	float2	tcdbump	:TEXCOORD5;//d-bump
+	float2	tcdbump	:TEXCOORD5;
 #endif
 #ifdef USE_LM_HEMI
-		float2	lmh	:TEXCOORD6;//lm-hemi
+		float2	lmh	:TEXCOORD6;
 #endif
 };
-////////////////////////////////////////////////////////////////
-//	Defer flat
+
+
 struct	v2p_flat
 {
 #if defined(USE_R2_STATIC_SUN)&& !defined(USE_LM_HEMI)
-	float4	tcdh	:TEXCOORD0;//Texture coordinates,     w=sun_occlusion
+	float4	tcdh	:TEXCOORD0;
 #else
-	float2	tcdh	:TEXCOORD0;//Texture coordinates
+	float2	tcdh	:TEXCOORD0;
 #endif
-	float4	position:TEXCOORD1;//position+hemi
-	float3	N		:TEXCOORD2;//Eye-space normal        (for lighting)
+	float4	position:TEXCOORD1;
+	float3	N		:TEXCOORD2;
 #ifdef USE_TDETAIL
-	float2	tcdbump	:TEXCOORD3;//d-bump
+	float2	tcdbump	:TEXCOORD3;
 #endif
 #ifdef USE_LM_HEMI
-	float2	lmh		:TEXCOORD4;//lm-hemi
+	float2	lmh		:TEXCOORD4;
 #endif
 	float4	hpos	:SV_Position;
 };
@@ -392,78 +380,78 @@ struct	v2p_flat
 struct	p_flat
 {
 #if defined(USE_R2_STATIC_SUN)&& !defined(USE_LM_HEMI)
-	float4	tcdh	:TEXCOORD0;//Texture coordinates,     w=sun_occlusion
+	float4	tcdh	:TEXCOORD0;
 #else
-	float2	tcdh	:TEXCOORD0;//Texture coordinates
+	float2	tcdh	:TEXCOORD0;
 #endif
-	float4	position:TEXCOORD1;//position+hemi
-	float3	N		:TEXCOORD2;//Eye-space normal        (for lighting)
+	float4	position:TEXCOORD1;
+	float3	N		:TEXCOORD2;
 #ifdef USE_TDETAIL
-	float2	tcdbump	:TEXCOORD3;//d-bump
+	float2	tcdbump	:TEXCOORD3;
 #endif
 #ifdef USE_LM_HEMI
-	float2	lmh		:TEXCOORD4;//lm-hemi
+	float2	lmh		:TEXCOORD4;
 #endif
 };
 
-////////////////////////////////////////////////////////////////
-//	Shadow
+
+
 struct	v_shadow_direct_aref
 {
-	float4	P		:POSITION;//(float,float,float,1)
-	int4	tc		:TEXCOORD0;//(u,v,frac,???)
+	float4	P		:POSITION;
+	int4	tc		:TEXCOORD0;
 };
 
 struct	v_shadow_direct
 {
-	float4	P		:POSITION;//(float,float,float,1)
+	float4	P		:POSITION;
 };
 
 
 struct	v2p_shadow_direct_aref
 {
-	float2	tc0		:TEXCOORD1;//Diffuse map for aref
-	float4	hpos	:SV_Position;//Clip-space position         (for rasterization)
+	float2	tc0		:TEXCOORD1;
+	float4	hpos	:SV_Position;
 };
 
 struct	v2p_shadow_direct
 {
-	float4	hpos	:SV_Position;//Clip-space position         (for rasterization)
+	float4	hpos	:SV_Position;
 };
 
 struct	p_shadow_direct_aref
 {
-	float2	tc0		:TEXCOORD1;//Diffuse map for aref
+	float2	tc0		:TEXCOORD1;
 };
 
-////////////////////////////////////////////////////////////////
-//	Model
+
+
 struct	v_model
 {
-	float4	P		:POSITION;//(float,float,float,1)
-	float3	N		:NORMAL;//(nx,ny,nz)
-	float3	T		:TANGENT;//(nx,ny,nz)
-	float3	B		:BINORMAL;//(nx,ny,nz)
-	float2	tc		:TEXCOORD0;//(u,v)
+	float4	P		:POSITION;
+	float3	N		:NORMAL;
+	float3	T		:TANGENT;
+	float3	B		:BINORMAL;
+	float2	tc		:TEXCOORD0;
 };
 
-////////////////////////////////////////////////////////////////
-//	Tree
+
+
 struct	v_tree
 {
-	float4	P		:POSITION;//(float,float,float,1)
-	float4	Nh		:NORMAL;//(nx,ny,nz)
-	float3	T		:TANGENT;//tangent
-	float3	B		:BINORMAL;//binormal
-	int4	tc		:TEXCOORD0;//(u,v,frac,???)
+	float4	P		:POSITION;
+	float4	Nh		:NORMAL;
+	float3	T		:TANGENT;
+	float3	B		:BINORMAL;
+	int4	tc		:TEXCOORD0;
 };
 
-////////////////////////////////////////////////////////////////
-//	Details
+
+
 struct        v_detail                    
 {
-        float4      pos               :POSITION;       //(float,float,float,1)
-        int4        misc       :TEXCOORD0;//(u(Q),v(Q),frac,matrix-id)
+        float4      pos               :POSITION;       
+        int4        misc       :TEXCOORD0;
 };
 
-#endif	//	common_iostructs_h_included
+#endif	
