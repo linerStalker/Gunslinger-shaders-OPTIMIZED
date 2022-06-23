@@ -5,11 +5,11 @@
 #define ISAMPLE 0
 #endif
 
-float3x4 m_sunmask;//ortho-projection
+float3x4 m_sunmask;
 #ifndef USE_MSAA
 Texture2D	s_patched_normal;
 #else
-Texture2DMS<float4,MSAA_SAMPLES>	s_patched_normal;
+TEXTURE2DMS(float4,MSAA_SAMPLES)	s_patched_normal;
 #endif
 
 #ifdef MSAA_OPTIMIZATION
