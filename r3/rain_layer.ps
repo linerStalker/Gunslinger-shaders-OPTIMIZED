@@ -2,8 +2,9 @@
 #include "lmodel.h"
 #include "shadow.h"
 
-
-float3x4 m_sunmask;//ortho-projection
+#ifndef USE_SUNMASK
+float3x4 m_sunmask;
+#endif
 Texture2D	s_water;
 
 
@@ -24,7 +25,7 @@ float4 main (float2 tc:TEXCOORD0,float2 tcJ:TEXCOORD1):SV_Target
 
 	float s=shadow		(PS);
 
-	float2 		tc1=mul(m_sunmask,_P);//
+	float2 		tc1=mul(m_sunmask,_P);
 
 	tc1/=2;
 

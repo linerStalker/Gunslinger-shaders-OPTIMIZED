@@ -1,8 +1,8 @@
 #include "common.h"
 #include "DX11\tess.h"
 
-//if you use ccw then corresponding coefs are w,v,u
-//if you use cw then corresponding coefs are u,v,w
+
+
 [domain("tri")]
 v2p_shadow_direct main(HS_CONSTANT_DATA_OUTPUT input,
 						float3 uvw:SV_DomainLocation,

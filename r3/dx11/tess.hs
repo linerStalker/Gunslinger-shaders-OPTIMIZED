@@ -26,7 +26,7 @@ HS_CONSTANT_DATA_OUTPUT PatchConstantsHS(
 	
 	ComputePNPatch(P,N,Output.patch);
 	
-//Discard back facing patches
+
 #	ifndef TESS_HM
 	bool doDiscard=(N[0].z>0.1)&& (N[1].z>0.1)&& (N[2].z>0.1)
 			&& (Output.patch.f3N110.z>0.1)&& (Output.patch.f3N011.z>0.1)&& (Output.patch.f3N101.z>0.1)
@@ -38,12 +38,12 @@ HS_CONSTANT_DATA_OUTPUT PatchConstantsHS(
 	
 #endif
 
-//	Data for interpolation in screen space
-//	float w0=mul(m_P,float4(ip[2].position.xyz,1)).w;
-//	float w1=mul(m_P,float4(ip[1].position.xyz,1)).w;
-//	float w2=mul(m_P,float4(ip[0].position.xyz,1)).w;
+
+
+
+
 	
-//	Output.www=float3(w0,w1,w2);
+
 	
     return Output;
 }

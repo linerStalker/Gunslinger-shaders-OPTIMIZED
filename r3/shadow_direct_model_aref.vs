@@ -1,8 +1,8 @@
 #include "common.h"
 #include "skin.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//Vertex
+
+
 v2p_shadow_direct_aref _main(v_model	I)
 {
 	v2p_shadow_direct_aref	O;
@@ -15,7 +15,7 @@ v2p_shadow_direct_aref _main(v_model	I)
  	return	O;
 }
 
-/////////////////////////////////////////////////////////////////////////
+
 #ifdef 	SKIN_NONE
 v2p_shadow_direct_aref 	main(v_model v)		{return _main(v);}
 #endif

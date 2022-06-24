@@ -1,8 +1,8 @@
 #include "common.h"
 #include "DX11\tess.h"
 
-//if you use ccw then corresponding coefs are w,v,u
-//if you use cw then corresponding coefs are u,v,w
+
+
 [domain("tri")]
 v2p_bumped main(HS_CONSTANT_DATA_OUTPUT input,
              float3 uvw:SV_DomainLocation,
@@ -10,24 +10,24 @@ v2p_bumped main(HS_CONSTANT_DATA_OUTPUT input,
 {
     v2p_bumped output;
 	
-	//interpolate in screen space
-	//uvw=uvw*input.www/dot(uvw,input.www);
+	
+	
 	
 	float  minc=min(uvw.x,min(uvw.y,uvw.z));
-	//if the vertex is not on an edge of the original triangle
+	
 	[flatten]if (minc!=0.0f)
 	{
-		//if we are at not the centre of the triangle
+		
 		[flatten]if(((1.0f/3.0f)-minc)>0.01f)
 		{
-			//solving for making the smallest uvw component 0.0f as this means the bigger ones sum to 1.0f and 
-			//are on the edge of the triangle
-			//if vertex gets too close to the edge move it on to the edge to replace to old edge vertex
-			//otherwise keep fK at 1.0f to restore the old uvw position
+			
+			
+			
+			
 			
 			float fK=(1.0f/3.0f)/((1.0f/3.0f)-minc);
 			fK=minc<0.1?fK:1.0f;
-			//update uvw
+			
 			uvw=lerp((1.0f/3.0f).xxx,uvw,fK);
 }
 }
@@ -84,9 +84,9 @@ v2p_bumped main(HS_CONSTANT_DATA_OUTPUT input,
 		output.position.xyz=triPos;
 
 	
-	//output.M1.z=Normal.x;
-	//output.M2.z=Normal.y;
-	//output.M3.z=Normal.z;
+	
+	
+	
 	output.hpos=mul(m_P,float4(output.position.xyz,1));
 
     return output;

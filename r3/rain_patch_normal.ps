@@ -2,7 +2,9 @@
 #include "lmodel.h"
 #include "shadow.h"
 
+#ifndef USE_SUNMASK
 float3x4 m_sunmask;
+#endif
 
 Texture3D	s_water;
 Texture2D	s_waterFall;
