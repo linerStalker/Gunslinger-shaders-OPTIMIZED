@@ -18,7 +18,7 @@ RUSSIAN (RUS):
 	4. По пути настроек игры пользователя, удалите папку shaders_cache, если таковая имеется.
 	5. Распакуйте все ресурсы игры (распаковщиков в интернете много, найдёте)
 	6. В распакованной папке открываем shaders, и три рендера: r1, r2, r3. В каждой папке рендера удаляем папку objects (это необходимо, так как именно там закэшированы все шейдеры, что не даёт появится изменениям на свет)
-	7. Запакуйте папку, запакованный .db / .dbx файл переместите в КОРНЕВУЮ ПАПКУ ИГР$/resources
+	7. Запакуйте папку, запакованный .db / .dbx файл переместите в КОРНЕВУЮ ПАПКУ ИГРЫ/resources
 	
 ДОПОЛНИТЕЛЬНО:
 	Если Вы найдете какие-либо баги, которые закономерно появились после установки оптимизированных шейдеров, то обязательно сообщите мне (linerStalker) и создайте проблему во вкладке репозитория Issues.
@@ -45,7 +45,7 @@ INSTALLATION INSTRUCTIONS:
 	4. In the user's game settings path, delete the 'shaders_cache' folder, if any.
 	5. Unpack all the resources of the game (there are many unpackers on the Internet, you will find it)
 	6. In the unpacked folder, open shaders, and three renders: r1, r2, r3. In each render folder, delete the objects folder (this is necessary, since it is there that all shaders are cached, which prevents changes from appearing)
-	7. Pack the folder, move the packed .db / .dbx file to the $root folder of the game$/resources
+	7. Pack the folder, move the packed .db / .dbx file to the ROOT FOLDER OF THE GAME/resources
 
 ADDITIONALLY:
 	If you find any bugs that naturally appeared after installing optimized shaders, then be sure to tell me (linerStalker) and create an issue in the Issues tab of the repository.
