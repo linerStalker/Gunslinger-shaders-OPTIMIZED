@@ -4,18 +4,18 @@
 struct vf
 {
 	float4 hpos	:POSITION;
-	float2 tc0	:TEXCOORD0;//base
-	float4 c0	:COLOR0;//color
+	float2 tc0	:TEXCOORD0;
+	float4 c0	:COLOR0;
 };
 
 vf 	_main (v_model v)
 {
 	vf 		o;
 
-	o.hpos=mul			(m_WVP,v.P);//xform,input in world coords
-	o.tc0=v.tc.xy;//copy tc
+	o.hpos=mul			(m_WVP,v.P);
+	o.tc0=v.tc.xy;
 
-	//calculate fade
+	
 	float3  dir_v=normalize		(mul(m_WV,v.P));
 	float3 	norm_v=normalize 		(mul(m_WV,v.N));
 	float 	fade=abs			(dot(dir_v,norm_v));
@@ -24,7 +24,7 @@ vf 	_main (v_model v)
 	return o;
 }
 
-/////////////////////////////////////////////////////////////////////////
+
 #ifdef 	SKIN_NONE
 vf	main(v_model v)		{return _main(v);}
 #endif

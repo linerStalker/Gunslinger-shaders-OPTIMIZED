@@ -11,11 +11,11 @@ struct	v2p_TL
 {
 	float2 	Tex0	:TEXCOORD0;
 	float4	Color	:COLOR;
-	float4 	HPos	:POSITION;//Clip-space position 	(for rasterization)
+	float4 	HPos	:POSITION;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//Vertex
+
+
 v2p_TL main (v_TL I)
 {
 	v2p_TL O;

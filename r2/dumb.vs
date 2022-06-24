@@ -2,11 +2,11 @@
 
 struct 	v2p
 {
-	float4 	hpos:		POSITION;//Clip-space position 	(for rasterization)
+	float4 	hpos:		POSITION;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//Vertex
+
+
 v2p 	main	(float4 P:	POSITION)
 {
 	v2p 		O;
