@@ -2,8 +2,8 @@
 
 struct vf
 {
-	float2 tc0	:TEXCOORD0;//base
-	float4 c0	:COLOR0;//color
+	float2 tc0	:TEXCOORD0;
+	float4 c0	:COLOR0;
 	float4 hpos	:SV_Position;
 };
 
@@ -11,10 +11,10 @@ vf main (v_static v)
 {
 	vf 		o;
 
-	o.hpos=mul			(m_WVP,v.P);//xform,input in world coords
-	o.tc0=unpack_tc_base(v.tc.xy,v.T.w,v.B.w);//copy tc
+	o.hpos=mul			(m_WVP,v.P);
+	o.tc0=unpack_tc_base(v.tc.xy,v.T.w,v.B.w);
 
-	//calculate fade
+	
 	float3  dir_v=normalize	(mul(m_WV,v.P));
 	float3 	norm_v=normalize (mul(m_WV,unpack_bx2(v.Nh).zyx));
 	float 	fade=abs		(dot(dir_v,norm_v));

@@ -2,6 +2,10 @@
 #define	common_defines_h_included
 
 
+#define GBUFFER_OPTIMIZATION
+#define USE_SUNMASK
+#define MSAA_OPTIMIZATION
+#define USE_HWSMAP
 
 #define def_gloss       float(2.f /255.f)
 #define def_aref        float(200.f/255.f)
@@ -19,7 +23,7 @@
 
 
 #ifndef SMAP_size
-#define SMAP_size        1024
+#define SMAP_size        2048
 #endif
 #define PARALLAX_H 0.02
 #define parallax float2(PARALLAX_H,-PARALLAX_H/2)
