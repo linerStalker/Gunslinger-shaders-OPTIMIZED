@@ -1,7 +1,7 @@
 #include "common.h"
 #include "lmodel.h"
 
-//	TODO:DX10:Move to Load
+
 #ifdef MSAA_OPTIMIZATION
 #ifdef GBUFFER_OPTIMIZATION
 float4 main (float4 tc:TEXCOORD0,float4 pos2d:SV_Position,uint iSample:SV_SAMPLEINDEX):SV_Target
@@ -18,9 +18,9 @@ float4 main (float4 tc:TEXCOORD0):SV_Target
 {
 	const float bias_mul=0.999f;
 
- 	//Sample the fat framebuffer:
-//	float4 _P=tex2Dproj 	(s_position,tc);
-//	float4 _N=tex2Dproj 	(s_normal,tc);
+ 	
+
+
 	float2	tcProj=tc.xy/tc.w;
 
 	gbuffer_data gbd=gbuffer_load_data(GLD_P(tcProj,pos2d,ISAMPLE));
