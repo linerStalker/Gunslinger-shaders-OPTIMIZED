@@ -1,19 +1,10 @@
 #include "common.h"
 #include "skin.h"
-/*
-struct vf
-{
-	float2 tc0	:TEXCOORD0;//base
-	float3 c0	:COLOR0;//color
-	float  fog	:FOG;
-	float4 hpos	:POSITION;
-};
-*/
 
 struct v2p
 {
-	float2 tc0	:TEXCOORD0;//base
-	float3 c0	:COLOR0;//color
+	float2 tc0	:TEXCOORD0;
+	float3 c0	:COLOR0;
 	float  fog	:FOG;
 	float4 hpos	:SV_Position;
 };
@@ -26,15 +17,15 @@ v2p _main(v_model v)
 	float3  pos_w=mul(m_W,pos);
 	float3 	norm_w=normalize(mul(m_W,v.N));
 
-	o.hpos=mul(m_WVP,pos);//xform,input in world coords
-	o.tc0=v.tc.xy;//copy tc
+	o.hpos=mul(m_WVP,pos);
+	o.tc0=v.tc.xy;
 	o.c0=calc_model_lq_lighting(norm_w);
-	o.fog=saturate(calc_fogging(float4(pos_w,1)));//fog,input in world coords
+	o.fog=saturate(calc_fogging(float4(pos_w,1)));
 
 	return o;
 }
 
-/////////////////////////////////////////////////////////////////////////
+
 #ifdef 	SKIN_NONE
 v2p	main(v_model v)		{return _main(v);}
 #endif
