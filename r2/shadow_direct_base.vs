@@ -2,12 +2,12 @@
 
 struct 	a2v
 {
-	float4 P:	 	POSITION;//Object-space position
- 	float4 tc0:		TEXCOORD0;//Texture coordinates
+	float4 P:	 	POSITION;
+ 	float4 tc0:		TEXCOORD0;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//Vertex
+
+
 v_shadow_direct 	main	(a2v  	I)
 {
 	v_shadow_direct	O;

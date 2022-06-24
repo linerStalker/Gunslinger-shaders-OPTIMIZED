@@ -2,12 +2,12 @@
 
 struct 	v2p
 {
- 	float2 	tc0:		TEXCOORD0;//base
- 	half3 	tc1:		TEXCOORD1;//environment
-  	half4	c0:			COLOR0;//sun.(fog*fog)
+ 	float2 	tc0:		TEXCOORD0;
+ 	half3 	tc1:		TEXCOORD1;
+  	half4	c0:			COLOR0;
 };
 
-//Pixel
+
 uniform	float4 		m_actor_params;
 uniform	float4 		m_affects;
 
@@ -19,7 +19,7 @@ half4 	main	(v2p I)	:COLOR
 	t_base.r+=(0.1<m_actor_params.a)?0:0.5;
 	t_base.g-=(0.1<m_actor_params.a)?0:0.5;
 	
-	//Шум при выбросе
+	
 	half noise=get_noise(I.tc0*timers.z)*m_affects.x*m_affects.x*30;
 	t_base.r+=noise;
 	t_base.g+=noise;

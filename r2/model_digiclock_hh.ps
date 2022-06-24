@@ -10,17 +10,17 @@ f_deffer 	main	(p_flat I)
   half digit=m_digiclock.x;
   I.tcdh.x=digit+(I.tcdh.x*0.1);
 
-  //diffuse
-  half3 D=tbase		(I.tcdh);//IN: rgb.a
+  
+  half3 D=tbase		(I.tcdh);
 
-  //hemi,sun,material
+  
   half 	ms=xmaterial;
 #ifdef USE_LM_HEMI
 	half4	lm=tex2D			(s_hemi,I.lmh);
-//	half 	h=dot			(lm.rgb,1.h/3.h);
+
 	half 	h=lm.a;
 # ifdef USE_R2_STATIC_SUN
-//		 	ms=lm.w;
+
 			ms=lm.g;
 # endif
 #else
@@ -34,10 +34,10 @@ f_deffer 	main	(p_flat I)
 	half4	t_noise=tex2D	(s_lmap,I.tcdh);
 	D.rgb+=t_noise.rgb*noise+0.1;
 
-	//2. Standart output
+	
 	O.Ne    =half4		(normalize((half3)I.N.xyz),	h);
 	O.position=half4 	(I.position.xyz+O.Ne.xyz*def_virtualh/2.h,ms);
-	O.C=half4		(D.rgb,							def_gloss);//OUT:rgb.gloss
+	O.C=half4		(D.rgb,							def_gloss);
 
 	return O;
 }
