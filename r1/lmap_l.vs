@@ -14,11 +14,11 @@ vf main (v_lmap v)
 	vf 		o;
 
 	
-	o.hpos=mul			(m_VP,v.P);//xform,input in world coords
-	o.tc0=unpack_tc_lmap	(v.uv1);//copy tc 
+	o.hpos=mul			(m_VP,v.P);
+	o.tc0=unpack_tc_lmap	(v.uv1);
 	o.tc1=o.tc0;
-	o.c0=v_hemi		();//just hemisphere+ambient
-	o.fog=calc_fogging 		(v.P);//fog,input in world coords
+	o.c0=v_hemi		();
+	o.fog=calc_fogging 		(v.P);
 
 	return o;
 }

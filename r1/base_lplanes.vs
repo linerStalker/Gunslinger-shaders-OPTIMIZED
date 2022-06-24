@@ -3,18 +3,17 @@
 struct vf
 {
 	float4 hpos	:POSITION;
-	float2 tc0	:TEXCOORD0;//base
-	float4 c0	:COLOR0;//color
+	float2 tc0	:TEXCOORD0;
+	float4 c0	:COLOR0;
 };
 
 vf main (v_vert v)
 {
 	vf 		o;
 
-	o.hpos=mul			(m_WVP,v.P);//xform,input in world coords
-	o.tc0=unpack_tc_base	(v.uv.xy,v.T.w,v.B.w);//copy tc
+	o.hpos=mul			(m_WVP,v.P);
+	o.tc0=unpack_tc_base	(v.uv.xy,v.T.w,v.B.w);
 
-	//calculate fade
 	float3  dir_v=normalize		(mul(m_WV,v.P));
 	float3 	norm_v=normalize 		(mul(m_WV,unpack_bx2(v.N)));
 	float 	fade=abs			(dot(dir_v,norm_v));

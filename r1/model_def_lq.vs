@@ -4,8 +4,8 @@
 struct vf
 {
 	float4 hpos	:POSITION;
-	float2 tc0	:TEXCOORD0;//base
-	float3 c0	:COLOR0;//color
+	float2 tc0	:TEXCOORD0;
+	float3 c0	:COLOR0;
 	float  fog	:FOG;
 };
 
@@ -17,10 +17,10 @@ vf 	_main (v_model v)
 	float3  pos_w=mul			(m_W,pos);
 	float3 	norm_w=normalize 		(mul(m_W,v.norm));
 
-	o.hpos=mul			(m_WVP,pos);//xform,input in world coords
-	o.tc0=v.tc.xy;//copy tc
+	o.hpos=mul			(m_WVP,pos);
+	o.tc0=v.tc.xy;
 	o.c0=calc_model_lq_lighting(norm_w);
-	o.fog=calc_fogging 		(float4(pos_w,1));//fog,input in world coords
+	o.fog=calc_fogging 		(float4(pos_w,1));
 
 #ifdef SKIN_COLOR
 	o.c0.rgb*=v.rgb_tint;
@@ -29,7 +29,7 @@ vf 	_main (v_model v)
 	return o;
 }
 
-/////////////////////////////////////////////////////////////////////////
+
 #define SKIN_LQ
 #define SKIN_VF vf
 #include "skin_main.h"

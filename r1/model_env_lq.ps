@@ -2,13 +2,11 @@
 
 struct 	v2p
 {
- 	half2 	tc0:		TEXCOORD0;//base
- 	half3 	tc1:		TEXCOORD1;//environment
-  	half3	c0:		COLOR0;//sun
+ 	half2 	tc0:		TEXCOORD0;
+ 	half3 	tc1:		TEXCOORD1;
+  	half3	c0:		COLOR0;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//Pixel
 half4 	main_ps_1_1	(v2p I)	:COLOR
 {
 	half4	t_base=tex2D		(s_base,I.tc0);
@@ -18,6 +16,5 @@ half4 	main_ps_1_1	(v2p I)	:COLOR
 	half3	light=I.c0;
 	half3	final=light*base*2;
 
-	//out
 	return  half4	(final.r,final.g,final.b,t_base.a);
 }
