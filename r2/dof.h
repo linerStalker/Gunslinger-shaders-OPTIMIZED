@@ -60,7 +60,7 @@ half3	dof(float2 center)
 	half3	sum=tex2D(s_image,center);
 	half 	contrib=1.h;
 
-   	for (uint i=0;i<12;++i)
+   	for (int i=0;i<12;++i)
 	{
 		float2 	tap=center+o[i];
 		half4	tap_color=tex2D	(s_image,tap);

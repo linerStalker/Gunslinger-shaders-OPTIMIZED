@@ -117,9 +117,9 @@ half	calc_ssao(half3 P,half3 N,half2 tc,half2 tcJ)
 
 
 
-for (uint rad=0;rad<RINGS;++rad)
+for (int rad=0;rad<RINGS;++rad)
 {
-	for (uint dir=0;dir<DIRS;++dir)
+	for (int dir=0;dir<DIRS;++dir)
 	{
 		SmallTap.x+=0.31337f;
 		SmallTap.y+=0.73313f;

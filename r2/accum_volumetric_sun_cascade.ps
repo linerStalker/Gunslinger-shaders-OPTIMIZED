@@ -75,8 +75,8 @@ float4 	main (float4 tc:TEXCOORD0,float4 tcJ:TEXCOORD1):COLOR
 		current-=delta;
 }
 	#else
-	uint n=(uint)((P.z-0.3)/ deltaDepth);
-	for (uint i=0;i<n;++i)
+	int n=(int)((P.z-0.3)/ deltaDepth);
+	for (int i=0;i<n;++i)
 	{	
 #ifndef	FILTER_LOW
 		res+=density*shadow_volumetric(current);
