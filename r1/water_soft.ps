@@ -7,16 +7,16 @@
 struct   vf
 {
         float4         hpos       :        POSITION;
-      float2  tbase       :       TEXCOORD0;//base
-           float2         tnorm0       :       TEXCOORD1;//nm0
-           float2         tnorm1       :       TEXCOORD2;//nm1
+      float2  tbase       :       TEXCOORD0;
+           float2         tnorm0       :       TEXCOORD1;
+           float2         tnorm1       :       TEXCOORD2;
         half3         M1               :       TEXCOORD3;
         half3         M2               :       TEXCOORD4;
         half3         M3               :       TEXCOORD5;
         half3        v2point       :       TEXCOORD6;
 	float4      tctexgen   :        TEXCOORD7;
            half4        c0               :         COLOR0    ;
-//    float          fog       :        FOG    ;
+
 };
 
 uniform sampler2D	s_nmap;
@@ -26,10 +26,10 @@ uniform sampler2D	s_leaves;
 
 #if defined(NEED_SOFT_WATER)
 half3	water_intensity;
-#endif	//	defined(USE_SOFT_WATER)&& defined(NEED_SOFT_WATER)
+#endif	
 
-////////////////////////////////////////////////////////////////////////////////
-//Pixel
+
+
 
 
 
@@ -44,34 +44,34 @@ half4   main (vf I):COLOR
 			Nw=normalize (Nw);
 	half3	v2point=normalize (I.v2point);
 	half3	vreflect=reflect(v2point,Nw);
-			vreflect.y=vreflect.y*2-1;//fake remapping
+			vreflect.y=vreflect.y*2-1;
 
 
 	half3	env0=texCUBE (s_env0,vreflect);
 	half3	env1=texCUBE (s_env1,vreflect);
 	half3	env=lerp (env0,env1,L_ambient.w);
 
-//сила отражения неба
-		//	env*=env*2;
-		//	env*=env*1.65;//было в 2K0006
-			env*=env*1.7;//2M0006
+
+		
+		
+			env*=env*1.7;
 
 
 	
 	half	fresnel=saturate (dot(vreflect,v2point));
-        //half	fresnel=(dot(vreflect,v2point));
+        
 
 
-	half	power=pow(fresnel,9);//есть прозрачность
-	//half	power=pow(fresnel,0);//нет прозрачности
-
-//	half	amount=0.15h+0.25h*power;//1=full env,0=no env //было в 2K0006
-//	half	amount=0.15h+0.10h*power;//сильно темнеет
-	half	amount=0.15h+0.17h*power;//2M0006
+	half	power=pow(fresnel,9);
+	
 
 
 
-////////////////
+	half	amount=0.15h+0.17h*power;
+
+
+
+
 
 
 	half3	c_reflection =env*amount;
@@ -79,28 +79,11 @@ half4   main (vf I):COLOR
 
 			final*=I.c0*2;
 
-        //tonemap
-#ifdef    USE_VTF
-//            final             *=I.c0.w;
-#else
-//            final             *=tex2D        (s_tonemap,I.tbase).x;//any TC-OK
-#endif
-
 #ifdef NEED_SOFT_WATER
-
-
-//прозрачность и темноте
-//	half	alpha=0.75h+0.25h*power;//слишком темно 1=full env,0=no env
-//	half	alpha=0.25h*power;//совсем прозрачно
-	half	alpha=0.50h+0.25h*power;//было в 2K0006
-
-
-
+	half	alpha=0.50h+0.25h*power;
 	return  half4   (final,alpha*I.c0.a*I.c0.a);
 
-#else	//	NEED_SOFT_WATER
-
+#else
         return  half4   (final,1);
-
-#endif	//	NEED_SOFT_WATER
+#endif	
 }

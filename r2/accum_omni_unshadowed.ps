@@ -5,7 +5,7 @@ half4 	main		(float4 tc:TEXCOORD0)	:COLOR
 {
   const half bias_mul=0.999f;
 
-  //Sample the fat framebuffer:
+  
   half4 _P=tex2Dproj 	(s_position,tc);
   half4 _N=tex2Dproj 	(s_normal,tc);
 

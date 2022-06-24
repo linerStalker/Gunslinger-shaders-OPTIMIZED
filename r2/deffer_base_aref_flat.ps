@@ -5,7 +5,7 @@ f_deffer 	main	(p_flat I)
 {
   f_deffer	O;
 
-  //1. Base texture+kill pixels with low alpha
+  
   half4 D=tbase	 	(I.tcdh);
   clip		(D.w-def_aref);
 
@@ -13,7 +13,7 @@ f_deffer 	main	(p_flat I)
 	D.rgb=2*D.rgb*tex2D	(s_detail,I.tcdbump).rgb;
 #endif
 
-	//hemi,sun,material
+	
 	half 	ms=xmaterial;
 #ifdef USE_LM_HEMI
 	half4	lm=tex2D			(s_hemi,I.lmh);
@@ -28,9 +28,9 @@ f_deffer 	main	(p_flat I)
 # endif
 #endif
 
-  //2. Standart output
+  
   O.Ne    =half4		(normalize((half3)I.N.xyz),	h);
-  O.position=half4 	(I.position.xyz+O.Ne.xyz*def_virtualh/2.h	,ms);//.
-  O.C=half4		(D.rgb,							def_gloss);//OUT:rgb.gloss
+  O.position=half4 	(I.position.xyz+O.Ne.xyz*def_virtualh/2.h	,ms);
+  O.C=half4		(D.rgb,							def_gloss);
   return O;
 }

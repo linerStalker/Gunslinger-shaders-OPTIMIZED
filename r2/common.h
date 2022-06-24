@@ -4,7 +4,7 @@
 #include "shared\common.h"
 
 #ifndef SMAP_size
-#define SMAP_size        1024
+#define SMAP_size        2048
 #endif
 #define PARALLAX_H 0.02
 #define parallax float2(PARALLAX_H,-PARALLAX_H/2)
@@ -14,6 +14,12 @@
 #else
 #  define xmaterial half(L_material.w)
 #endif
+#define USE_SUNMASK
+#define USE_HWSMAP
+#define USE_HWSMAP_PCF
+#define USE_FETCH4
+#define USE_VTF
+#define FP16_FILTER
 
 uniform half4	hemi_cube_pos_faces,hemi_cube_neg_faces,L_material,Ldynamic_color,Ldynamic_pos,Ldynamic_dir,fog_plane;
 uniform half4	J_direct[6],J_spot[6];
@@ -169,21 +175,15 @@ uniform sampler3D	s_material;
 #define	LUMINANCE_VECTOR                 half3(0.3f,0.38f,0.22f)
 void        tonemap              (out half4 low,out half4 high,half3 rgb,half scale)
 {
-        rgb=  	rgb*scale;
+	rgb=rgb*scale;
+//#ifdef USE_BRANCHING
+	low=((rgb*(1+rgb/2.89))/ (rgb+1)).xyzz;
 
-		const float fWhiteIntensity=1.7;
-
-		const float fWhiteIntensitySQR=fWhiteIntensity*fWhiteIntensity;
-#ifdef USE_BRANCHING		
-        
-
-		low=((rgb*(1+rgb/fWhiteIntensitySQR))/ (rgb+1)).xyzz;
-
-        high=low/def_hdr;
-#else
-        low=   half4           (((rgb*(1+rgb/fWhiteIntensitySQR))/ (rgb+1)),       0);
-        high=   half4       	(rgb/def_hdr,0);
-#endif
+	high=low/def_hdr;
+//#else
+//	low=   half4(((rgb*(1+rgb/2.89))/(rgb+1)),0);
+//	high=   half4(rgb/def_hdr,0);
+//#endif
 
 }
 half4 combine_bloom (half3  low,half4 high)

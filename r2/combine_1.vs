@@ -1,21 +1,21 @@
 #include "common.h"
 
 struct 	_in        	{
-	float4 	p	:POSITION;//xy=pos,zw=tc0
-	float2	tcJ	:TEXCOORD0;//jitter coords
+	float4 	p	:POSITION;
+	float2	tcJ	:TEXCOORD0;
 };
 
 struct 	_out        	{
 	float4 	hpos	:POSITION;
 #ifdef USE_VTF
-  	float4 	tc0	:TEXCOORD0;//tc.xy,tc.w=tonemap scale
+  	float4 	tc0	:TEXCOORD0;
 #else
-  	float2 	tc0	:TEXCOORD0;//tc.xy 
+  	float2 	tc0	:TEXCOORD0;
 #endif
-	float2	tcJ	:TEXCOORD1;//jitter coords
+	float2	tcJ	:TEXCOORD1;
 };
-//////////////////////////////////////////////////////////////////////////////////////////
-//Vertex
+
+
 _out 	main	(_in   I)
 {
 	_out 		O;
