@@ -1,10 +1,11 @@
 #include "common.h"
-
+//#define TEST_MBLUR
 #ifdef 	USE_DISTORT
 Texture2D			s_distort;
 #endif
 uniform float4 		e_barrier,e_weights,e_kernel;
 
+#ifdef TEST_MBLUR
 float4x4	m_current,m_previous;
 float2 	m_blur;		// scale_x / 12, scale_y / 12
 
@@ -32,6 +33,7 @@ float3 	mblur	(float2 UV, float3 pos, float3 blurred)
 	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 11.h + UV).rgb;
 	return 	blurred/12.f;
 }
+#endif
 
 #ifdef GBUFFER_OPTIMIZATION
 float4 main (v_aa_AA I,float4 pos2d:SV_POSITION):SV_Target
@@ -85,13 +87,8 @@ float4 main (v_aa_AA I):SV_Target
   gbuffer_data gbd6r=gbuffer_load_data(tc6r,0);
 #endif
 
-  
-
   float4 dc=float4(gbd0.P,gbd0.mtl);
   float4 dd;
-
-
-
 
 	dd.x=(float)gbd1.P.z 
 	+	(float)gbd2.P.z;
@@ -105,7 +102,6 @@ float4 main (v_aa_AA I):SV_Target
 	dd=step		(dd,0);
   float  de=saturate	(dot(dd,e_weights.y));
 
-  
   float 	w=(1-de*ne)*e_kernel.x;
 
 #ifdef 	USE_DISTORT
@@ -115,22 +111,16 @@ float4 main (v_aa_AA I):SV_Target
 #else
 	float2	center=I.Tex0;
 #endif
-
-  
-  
-
 	float2	offset=center*(1-w);
-
-
-
 
 	float4	s0=s_image.Sample(smp_rtlinear,offset+I.Tex1*w);
 	float4	s1=s_image.Sample(smp_rtlinear,offset+I.Tex2*w);
 	float4	s2=s_image.Sample(smp_rtlinear,offset+I.Tex3*w);
 	float4	s3=s_image.Sample(smp_rtlinear,offset+I.Tex4*w);
-
+#ifdef TEST_MBLUR
 	float3 	final=mblur(center,dc,(s0+s1+s2+s3)/4.h);
-
-
+#else
+	float3 final=(s0+s1+s2+s3)/4.h;
+#endif
 	return combine_bloom(final,s_bloom.Sample(smp_rtlinear,I.Tex0));
 }
