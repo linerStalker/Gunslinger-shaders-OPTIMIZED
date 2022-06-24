@@ -17,7 +17,7 @@ v2p_particle main(vv I)
 {
 	float4 	w_pos=I.P;
 
-	//Eye-space pos/normal
+	
 	v2p_flat 		O;
 	O.hpos=mul		(m_WVP,w_pos);
 	O.N=normalize (eye_position-w_pos);
@@ -26,7 +26,7 @@ v2p_particle main(vv I)
 	O.position=float4	(Pe,.2h);
 
 #ifdef 	USE_TDETAIL
-	O.tcdbump=O.tcdh*dt_params;//dt tc
+	O.tcdbump=O.tcdh*dt_params;
 #endif
 
 	v2p_particle	pp;

@@ -1,7 +1,7 @@
 #include "fluid_common.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////
-//	Vertex
+
+
 v2g_fluidsim main(v_fluidsim input)
 {
     v2g_fluidsim output=(v2g_fluidsim)0;
@@ -16,7 +16,7 @@ v2g_fluidsim main(v_fluidsim input)
     float y=output.texcoords.y;
     float z=output.texcoords.z;
 
-    //compute single texel offsets in each dimension
+    
     float invW=1.0/textureWidth;
     float invH=1.0/textureHeight;
     float invD=1.0/textureDepth;

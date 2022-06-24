@@ -3,10 +3,10 @@
 
 v2p_flat _main(v_model I)
 {
-	//world-space  N
+	
 	float3 	N_w=mul(m_W,I.N);
 
-	//Eye-space pos/normal
+	
 	v2p_flat 		O;
 	float3	Pe=mul(m_WV,I.P);
 	O.hpos=mul(m_WVP,I.P);
@@ -14,7 +14,7 @@ v2p_flat _main(v_model I)
 
 	O.tcdh=float4(I.tc.xyyy);
 	
-	//Hemi cube lighting
+	
 	float3	Nw=mul		((float3x3)m_W,(float3)I.N);
 	float3  hc_pos=(float3)hemi_cube_pos_faces;
 	float3	hc_neg=(float3)hemi_cube_neg_faces;
@@ -22,20 +22,20 @@ v2p_flat _main(v_model I)
 	float	hemi_val=dot(hc_mixed,abs(Nw));
 	hemi_val=saturate(hemi_val);
 
-	O.position=float4(Pe,hemi_val);//Use L_material.x for old behaviour;
+	O.position=float4(Pe,hemi_val);
 
 #if defined(USE_R2_STATIC_SUN)&& !defined(USE_LM_HEMI)
-	O.tcdh.w=L_material.y;//(,,,dir-occlusion)
+	O.tcdh.w=L_material.y;
 #endif
 
 #ifdef USE_TDETAIL
-	O.tcdbump=O.tcdh*dt_params;//dt tc
+	O.tcdbump=O.tcdh*dt_params;
 #endif
 
 	return	O;
 }
 
-/////////////////////////////////////////////////////////////////////////
+
 #ifdef 	SKIN_NONE
 v2p_flat	main(v_model v)		{return _main(v);}
 #endif

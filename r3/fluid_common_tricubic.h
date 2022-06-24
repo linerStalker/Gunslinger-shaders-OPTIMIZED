@@ -1,8 +1,8 @@
-/////////////////////////////////
-//BEGIN Custom Sampling Functions
+
+
 Texture1D   HHGGTex;
 
-//cubic b-spline
+
 float bsW0(float a)
 {
     return (1.0/6.0*(-(a*a*a)+(3.0*a*a)-(3.0*a)+1.0));
@@ -42,9 +42,9 @@ float h1texels(float a)
 {
     return (1.0-a+(bsW3(a)/(bsW2(a)+bsW3(a))));
 }
-///end cubic-bspline
 
-//first derivative of cubic b-spline
+
+
 float bsfdW0(float a)
 {
     return (1.0/6.0*(-(3.0*a*a)+(6.0*a)-3.0));
@@ -84,12 +84,12 @@ float hfd1texels(float a)
 {
     return (1.0-a+(bsfdW3(a)/(bsfdW2(a)+bsfdW3(a))));
 }
-///end first derivative of cubic b-spline
+
 
 float4 getHHGG(float xTexels)
 {
-//float a=frac(xTexels);
-//return float4(-h0texels(a),h1texels(a),1.0-g0(a),g0(a));
+
+
 
 	return HHGGTex.SampleLevel(samRepeat,xTexels,0);
 }
@@ -231,5 +231,4 @@ float4 SampleGradient(Texture3D tex,float3 tc)
     else
         return SampleGradientTrilinear(tex,tc);
 }
-//END Custom Sampling Functions
-/////////////////////////////////
+
