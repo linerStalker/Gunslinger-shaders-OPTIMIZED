@@ -11,7 +11,7 @@ vf main (float4	P:POSITION)
 {
 	vf 		o;
 
-	o.hpos=mul			(m_WVP,P);//xform,input in world coords
+	o.hpos=mul			(m_WVP,P);
 	o.C=tfactor;
 
 	return o;

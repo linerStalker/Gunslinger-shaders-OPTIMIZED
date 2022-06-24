@@ -3,33 +3,26 @@
 
 struct 	v2p
 {
- 	half4 	tc0:		TEXCOORD0;//base
- 	half4 	tc1:		TEXCOORD1;//environment
-  	half4	c0:			COLOR0;//sun.(fog*fog)
+ 	half4 	tc0:		TEXCOORD0;
+ 	half4 	tc1:		TEXCOORD1;
+  	half4	c0:			COLOR0;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
-
-//Pixel
 uniform sampler2D	s_vp2;
 
 half4 	main	(v2p I)	:COLOR
 {
-
 	half4	t_base=tex2D	(s_base,I.tc0);
 
-	I.tc0.x=(I.tc0.x-0.5f)*m_hud_params.x+0.5f+m_zoom_deviation.x;//Растягиваем картинку в линзе так,чтобы на любом разрешении экрана были правильные пропорции
+	I.tc0.x=(I.tc0.x-0.5f)*m_hud_params.x+0.5f+m_zoom_deviation.x;
 	I.tc0.y=I.tc0.y+m_zoom_deviation.y;
-	half4	t_vp2	=tex2D (s_vp2,I.tc0);//Изображение со второго вьюпорта
+	half4	t_vp2	=tex2D (s_vp2,I.tc0);
 
 	half4	final	=half4 (0,0,0,0);
 
-	//**Ночной режим**////Зеленый ПНВ
 	t_vp2.rgb=calc_night_vision_effect(I.tc0,t_vp2,half3(1.0,2.0,1.0));
 
-	//Миксуем с сеткой
 	half4 res=lerp	(t_vp2,t_base,t_base.a);
 
-	//out
 	return  half4	(res.r,res.g,res.b,min(m_hud_params.y,m_hud_params.a));
 }

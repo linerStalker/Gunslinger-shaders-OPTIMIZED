@@ -11,9 +11,9 @@ vf main (v_vert v)
 {
 	vf 		o;
 
-	o.hpos=mul			(m_VP,v.P);//xform,input in world coords
+	o.hpos=mul			(m_VP,v.P);
 	o.c=v.color;
-	o.fog=calc_fogging 		(v.P);//fog,input in world coords
+	o.fog=calc_fogging 		(v.P);
 
 	return o;
 }

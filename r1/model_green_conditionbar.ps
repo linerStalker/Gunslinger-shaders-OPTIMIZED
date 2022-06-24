@@ -2,12 +2,12 @@
 
 struct 	v2p
 {
- 	half4 	tc0:		TEXCOORD0;//base
- 	half4 	tc1:		TEXCOORD1;//environment
-  	half4	c0:			COLOR0;//sun.(fog*fog)
+ 	half4 	tc0:		TEXCOORD0;
+ 	half4 	tc1:		TEXCOORD1;
+  	half4	c0:			COLOR0;
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
+
 
 half4 	main_ps_1_4	(v2p I)	:COLOR
 {

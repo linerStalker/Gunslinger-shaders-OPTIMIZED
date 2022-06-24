@@ -1,9 +1,7 @@
 #ifndef	SKIN_MAIN_INCLUDED
 #define	SKIN_MAIN_INCLUDED
 
-//////////////////////////////////////////////////////
 #ifdef SKIN_LQ
-//////////////////////////////////////////////////////
 
 #ifdef 	SKIN_NONE
 SKIN_VF	main(v_model v)		{return _main(v);}
@@ -29,9 +27,7 @@ SKIN_VF	main(v_model_skinned_3 v)	{return _main(skinning_3lq(v));}
 SKIN_VF	main(v_model_skinned_4 v)	{return _main(skinning_4lq(v));}
 #endif
 
-//////////////////////////////////////////////////////
-#else	//	SKIN_LQ
-//////////////////////////////////////////////////////
+#else	
 
 #ifdef 	SKIN_NONE
 SKIN_VF	main(v_model v)		{return _main(v);}
@@ -57,8 +53,6 @@ SKIN_VF	main(v_model_skinned_3 v)	{return _main(skinning_3(v));}
 SKIN_VF	main(v_model_skinned_4 v)	{return _main(skinning_4(v));}
 #endif
 
-//////////////////////////////////////////////////////
-#endif	//	SKIN_LQ
-//////////////////////////////////////////////////////
+#endif	
 
-#endif	//	SKIN_MAIN_INCLUDED
+#endif	

@@ -18,10 +18,10 @@ vf main (vv v)
 {
 	vf 		o;
 
-	o.hpos=mul	(m_WVP,v.P);//xform,input in world coords
-	o.tc=v.tc;//copy tc
-	o.c=v.c;//copy color
-	o.fog=calc_fogging (v.P);//fog,input in world coords
+	o.hpos=mul	(m_WVP,v.P);
+	o.tc=v.tc;
+	o.c=v.c;
+	o.fog=calc_fogging (v.P);
 
 	return o;
 }

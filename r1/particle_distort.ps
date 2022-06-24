@@ -2,13 +2,10 @@
 
 struct 	v2p
 {
- 	float2 	tc0	:	TEXCOORD0;//base
-	half4	c	:	COLOR0;//diffuse
+ 	float2 	tc0	:	TEXCOORD0;
+	half4	c	:	COLOR0;
 };
 
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//Pixel
 uniform sampler s_distort;
 half4 	main_ps_1_1	(v2p I)	:COLOR
 {

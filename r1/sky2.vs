@@ -21,11 +21,11 @@ vf main (vi v)
 	vf 		o;
 
 	float4	tpos	=mul	(1000,v.p);
-        o.hpos        =mul       (m_WVP,tpos);//xform,input in world coords,1000-magic number
+        o.hpos        =mul       (m_WVP,tpos);
 	o.hpos.z	=o.hpos.w;
-	o.c=v.c;//copy color
-	o.tc0=v.tc0;//copy tc
-	o.tc1=v.tc1;//copy tc
+	o.c=v.c;
+	o.tc0=v.tc0;
+	o.tc1=v.tc1;
 
 	return o;
 }
