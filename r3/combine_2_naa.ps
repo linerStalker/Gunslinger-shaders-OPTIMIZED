@@ -1,5 +1,4 @@
 #include "common.h"
-#include "mblur.h"
 #include "dof.h"
 
 #ifndef USE_MSAA
@@ -9,11 +8,7 @@ Texture2D 			s_distort;
 TEXTURE2DMS(float4,MSAA_SAMPLES) s_distort;
 #define	EPSDEPTH	0.001
 #endif
-uniform float4 		e_barrier;
-uniform float4 		e_weights;
-uniform float4 		e_kernel;
-
-
+uniform float4 		e_barrier,e_weights,e_kernel;
 
 struct c2_out
 {
@@ -22,6 +17,34 @@ struct c2_out
 	float	Depth:SV_Depth;
 #endif
 };
+
+float4x4	m_current,m_previous;
+float2 	m_blur;		// scale_x / 12, scale_y / 12
+
+float3 	mblur	(float2 UV, float3 pos, float3 blurred)
+{
+	float4 	pos4		= float4	(pos,1.h);
+
+	float4 	p_current	= mul	(m_current,	pos4);
+	float4 	p_previous 	= mul	(m_previous,	pos4);
+	float2 	p_velocity 	= m_blur * ( (p_current.xy/p_current.w)-(p_previous.xy/p_previous.w) );
+		p_velocity	= clamp	(p_velocity,-0.001,+0.001);
+
+	// For each sample, sum up each sample's color in "Blurred" and then divide
+	// to average the color after all the samples are added.
+	blurred 	+= 	s_image.Sample(smp_rtlinear,p_velocity * 1.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 2.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 3.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 4.h  + UV).rgb;
+	blurred 	+= 	s_image.Sample(smp_rtlinear,p_velocity * 5.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 6.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 7.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 8.h  + UV).rgb;
+	blurred 	+= 	s_image.Sample(smp_rtlinear,p_velocity * 9.h  + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 10.h + UV).rgb;
+	blurred		+= 	s_image.Sample(smp_rtlinear,p_velocity * 11.h + UV).rgb;
+	return 	blurred/12.f;
+}
 
 c2_out main(v2p_aa_AA I)
 {

@@ -3,10 +3,7 @@
 
 #include "common.h"
 
-uniform sampler2D       s_detailBump;
-uniform sampler2D       s_detailBumpX;
-uniform sampler2D       s_bumpX;
-
+uniform sampler2D       s_detailBump,s_detailBumpX,s_bumpX;
 
 struct	surface_bumped
 {
@@ -14,7 +11,6 @@ struct	surface_bumped
 	half3	normal;
 	half	gloss;
 	half	height;
-
 };
 
 float4 tbase(float2 tc)
@@ -24,17 +20,10 @@ float4 tbase(float2 tc)
 
 #if defined(ALLOW_STEEPPARALLAX)&& defined(USE_STEEPPARALLAX)
 
-static const float fParallaxStartFade=8.0f;
-static const float fParallaxStopFade=12.0f;
-
 void UpdateTC(inout p_bumped I)
 {
-	if (I.position.z<fParallaxStopFade)
+	if (I.position.z<12.0f)
 	{
-		const float maxSamples=25;
-		const float minSamples=5;
-		const float fParallaxOffset=-0.013;
-
 		float3	 eye=mul (float3x3(I.M1.x,I.M2.x,I.M3.x,
 									 I.M1.y,I.M2.y,I.M3.y,
 									 I.M1.z,I.M2.z,I.M3.z),-I.position.xyz);
@@ -42,10 +31,10 @@ void UpdateTC(inout p_bumped I)
 		eye=normalize(eye);
 		
 		
-		float nNumSteps=lerp(maxSamples,minSamples,eye.z);
+		float nNumSteps=lerp(25,5,eye.z);
 
 		float	fStepSize=1.0/nNumSteps;
-		float2	vDelta=eye.xy*fParallaxOffset*1.2;
+		float2	vDelta=eye.xy*-0.013*1.2;
 		float2	vTexOffsetPerStep=fStepSize*vDelta;
 
 		
@@ -68,7 +57,7 @@ void UpdateTC(inout p_bumped I)
 		float	fDelta2=((fCurrentBound+fStepSize)-fPrevHeight);
 		float	fDelta1=(fCurrentBound-fCurrHeight);
 		float	fParallaxAmount=(fCurrentBound*fDelta2-(fCurrentBound+fStepSize)*fDelta1)/ (fDelta2-fDelta1);
-		float	fParallaxFade=smoothstep(fParallaxStopFade,fParallaxStartFade,I.position.z);
+		float	fParallaxFade=smoothstep(12.0f,8.0f,I.position.z);
 		float2	vParallaxOffset=vDelta*((1-fParallaxAmount)*fParallaxFade);
 		float2	vTexCoord=I.tcdh+vParallaxOffset;
 	
