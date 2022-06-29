@@ -4,7 +4,6 @@
 
 struct PNPatch
 {
-    
 	float3 f3B210	:POSITION3;
 	float3 f3B120	:POSITION4;
 	float3 f3B021	:POSITION5;
@@ -12,8 +11,7 @@ struct PNPatch
 	float3 f3B102	:POSITION7;
 	float3 f3B201	:POSITION8;
 	float3 f3B111	:CENTER;
-		
-	
+
 	float3 f3N110	:NORMAL3;
 	float3 f3N011	:NORMAL4;
 	float3 f3N101	:NORMAL5;
@@ -39,8 +37,6 @@ void ComputeTessFactor(out float Edges[3]:SV_TessFactor,out float Inside:SV_Insi
 
 void ComputePNPatch(float3 P[3],float3 N[3],out PNPatch patch)
 {
-    
-    
     patch.f3B210=(2.0f*P[0].xyz+P[1].xyz-dot(P[1].xyz-P[0].xyz,N[0])*N[0])/ 3.0f;
     patch.f3B120=(2.0f*P[1].xyz+P[0].xyz-dot(P[0].xyz-P[1].xyz,N[1])*N[1])/ 3.0f;
     patch.f3B021=(2.0f*P[1].xyz+P[2].xyz-dot(P[2].xyz-P[1].xyz,N[1])*N[1])/ 3.0f;
@@ -51,7 +47,7 @@ void ComputePNPatch(float3 P[3],float3 N[3],out PNPatch patch)
 	
     float3 f3E=(patch.f3B210+patch.f3B120+patch.f3B021+patch.f3B012+patch.f3B102+patch.f3B201)/ 6.0f;
     float3 f3V=(P[0].xyz+P[1].xyz+P[2].xyz)/ 3.0f;
-    patch.f3B111=f3E+((f3E-f3V)/ 2.0f);
+    patch.f3B111=f3E+((f3E-f3V)*0.5f);
     
     
     float fV12=2.0f*dot(P[1].xyz-P[0].xyz,N[0]+N[1])/ dot(P[1].xyz-P[0].xyz,P[1].xyz-P[0].xyz);

@@ -10,8 +10,6 @@ struct 	v2p
 uniform sampler2D 	s_clouds0	:register(s0);
 uniform sampler2D 	s_clouds1	:register(s1);
 
-
-
 half4 	main	(v2p I)	:COLOR
 {
 	half4 	s0=tex2D		(s_clouds0,I.tc0);

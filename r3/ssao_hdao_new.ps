@@ -408,10 +408,10 @@ float ValleyAngle(uint2 u2ScreenCoord)
             
                 float4 f4LDSValue=f4Depth+(f4Normal*g_fHDAONormalScale.xxxx);
     		
-                StoreToLDS(f4LDSValue.x,uint2(uColumn+(uGather*2)+0,uRow+1));
+                StoreToLDS(f4LDSValue.x,uint2(uColumn+(uGather*2),uRow+1));
                 StoreToLDS(f4LDSValue.y,uint2(uColumn+(uGather*2)+1,uRow+1));
-                StoreToLDS(f4LDSValue.z,uint2(uColumn+(uGather*2)+1,uRow+0));
-                StoreToLDS(f4LDSValue.w,uint2(uColumn+(uGather*2)+0,uRow+0));
+                StoreToLDS(f4LDSValue.z,uint2(uColumn+(uGather*2)+1,uRow));
+                StoreToLDS(f4LDSValue.w,uint2(uColumn+(uGather*2),uRow));
        	}
 	}
     	    

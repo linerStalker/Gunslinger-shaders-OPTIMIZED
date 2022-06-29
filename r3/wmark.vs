@@ -14,12 +14,12 @@ vf main (v_static v)
 	vf 		o;
 
 	float3 	N=unpack_bx2	(v.Nh);
-	float4 	P=wmark_shift	(v.P,N);
+	float4 	P=wmark_shift	(v.P,N.xyz);
 	o.hpos=mul		(m_VP,P);
 	o.tc0=unpack_tc_base	(v.tc.xy,v.T.w,v.B.w);
 
 	o.c0=0;
-	o.fog=saturate(calc_fogging 		(v.P));
+	o.fog=saturate(calc_fogging(v.P));
 
 	return o;
 }

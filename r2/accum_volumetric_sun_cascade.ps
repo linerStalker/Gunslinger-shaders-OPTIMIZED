@@ -24,7 +24,6 @@
 	#endif
 #endif
 
-half4	volume_range;
 half4	sun_shafts_intensity;
 uniform	float4		screen_res;
 
@@ -98,6 +97,6 @@ float4 	main (float4 tc:TEXCOORD0,float4 tcJ:TEXCOORD1):COLOR
 
 	res*=fSturation;
 
-	return res*Ldynamic_color*1.0;
+	return res*Ldynamic_color;
 #endif	
 }

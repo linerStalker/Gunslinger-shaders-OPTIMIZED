@@ -15,14 +15,13 @@ vf main (v_lmap v)
 {
 	vf 		o;
 
-	float3	N=unpack_bx2		(v.N);
 	o.hpos=mul			(m_VP,v.P);
 	o.tc0=unpack_tc_base	(v.uv0.xy,v.T.w,v.B.w);
 	o.tc1=unpack_tc_lmap	(v.uv1);
 	o.tch=o.tc1;
 	o.c0=v_hemi();
-	o.c1=v_sun(N);
-	o.fog=calc_fogging 		(v.P);
+	o.c1=v_sun(unpack_bx2(v.N));
+	o.fog=calc_fogging(v.P);
 
 	return o;
 }

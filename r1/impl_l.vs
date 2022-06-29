@@ -12,7 +12,6 @@ vf main (v_lmap v)
 {
 	vf 		o;
 
-	
 	o.hpos=mul			(m_VP,v.P);
 	o.tc0=unpack_tc_base	(v.uv0.xy,v.T.w,v.B.w);
 	o.tc1=o.tc0;

@@ -34,7 +34,7 @@ half4        main        (v2p I):COLOR
 #endif	
 #endif	
 
-        half2        faded_bx2  =(faded*2-1)*W_DISTORT_POWER;
+        half2        faded_bx2  =(faded*2-1);
         half         faded_dot  =dot        (half3(faded_bx2,0),.75     );
         half         alpha          =.5f;       
 

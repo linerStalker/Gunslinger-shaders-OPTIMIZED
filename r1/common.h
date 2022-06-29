@@ -41,6 +41,7 @@ float4	calc_point 	(out float2 tc_att0,out float2 tc_att1,float4 w_pos,float3 w_
 }
 
 float3	calc_sun		(float3 norm_w)	{return L_sun_color*max(dot((norm_w),-L_sun_dir_w),0);}
+float3	v_hemi(){return L_hemi_color;}
 float3 	calc_model_hemi 	(float norm_y)	{return (norm_y*0.5+0.5)*L_dynamic_props.w*L_hemi_color;}
 float3	calc_model_lq_lighting	(float3 norm_w){return calc_model_hemi(norm_w.y)+L_ambient+L_dynamic_props.xyz*calc_sun(norm_w);}
 float3	_calc_model_lq_lighting	(float3 norm_w){return calc_model_hemi(norm_w.y)+L_ambient+.5*calc_sun(norm_w);}
@@ -108,7 +109,6 @@ uniform samplerCUBE s_env;
 
 #define def_distort	half(0.05f)
 
-float3	v_hemi 		()		{return L_hemi_color;}
 float3 	v_sun 		(float3 n)		{return L_sun_color*max(0,dot(n,-L_sun_dir_w));}
 float3 	v_sun_wrap	(float3 n,float w)	{return L_sun_color*(w+(1-w)*dot(n,-L_sun_dir_w));}
 half3	p_hemi		(float2 tc)

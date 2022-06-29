@@ -14,12 +14,11 @@ half4 	main_ps_1_1	(v2p I)	:COLOR
 	half4	t_base=tex2D		(s_base,I.tc0);
 	half4	t_lmap=tex2D		(s_lmap,I.tc1);
 
-	half3 	l_base=t_lmap.rgb;
-	half3	l_hemi=I.c0*p_hemi(I.tc2);
-	half3 	l_sun=I.c1*t_lmap.a;
-	half3	light=L_ambient+l_base+l_sun+l_hemi;
+	half3 light=t_lmap.rgb;
+	light+=I.c0*p_hemi(I.tc2);
+	light+=I.c1*t_lmap.a+L_ambient;
 
-	half3	final=light*t_base*2;
+	light*=t_base*2;
 	
-	return  half4	(final,t_base.a);
+	return  half4	(light,t_base.a);
 }

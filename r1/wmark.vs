@@ -1,9 +1,6 @@
 #include "common.h"
 #include "shared\wmark.h"
 
-
-
-
 struct vf
 {
 	float4 hpos	:POSITION;
@@ -17,7 +14,7 @@ vf main (v_vert v)
 	vf 		o;
 
 	float3 	N=unpack_bx2	(v.N);
-	float4 	P=wmark_shift		(v.P,N);
+	float4 	P=wmark_shift		(v.P,N.xyz);
 	o.hpos=mul				(m_VP,P);
 	o.tc0=unpack_tc_base	(v.uv.xy,v.T.w,v.B.w);
 

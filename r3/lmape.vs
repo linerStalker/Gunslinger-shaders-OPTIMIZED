@@ -24,15 +24,13 @@ struct vf
 vf main(v_static v)
 {
 	vf 		o;
-
-	float3 	pos_w=v.P;
-	float3 	norm_w=normalize(unpack_bx2(v.Nh));
 	
 	o.hpos=mul				(m_VP,v.P);
 	o.tc0=unpack_tc_base	(v.tc.xy,v.T.w,v.B.w);
 	o.tc1=unpack_tc_lmap	(v.lmh);
 	o.tch=o.tc1;
-	o.tc2=calc_reflection	(pos_w,norm_w);
+	float3 	norm_w=normalize(unpack_bx2(v.Nh));
+	o.tc2=calc_reflection	(float3(v.P),norm_w);
 	o.c0=v_hemi(norm_w.y);
 	o.c1=v_sun	(norm_w);
 	o.fog.x=saturate(calc_fogging (v.P));

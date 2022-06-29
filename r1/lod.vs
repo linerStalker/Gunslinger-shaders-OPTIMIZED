@@ -47,7 +47,7 @@ vf main (vv v)
 	float 	sun_c=1+L_SUN_HACK*dot(normal,L_sun_dir_w);
 
 	float3 	L_rgb=rgbh.rgb;
-	float3 	L_hemi=L_hemi_color*rgbh.w;
+	float3 	L_hemi=v_hemi()*rgbh.w;
 	float3 	L_sun=L_sun_color *sun*sun_c;
 	float3 	L_final=L_rgb+L_hemi+L_sun+L_ambient;
 

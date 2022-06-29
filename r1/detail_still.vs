@@ -15,19 +15,15 @@ vf main (v_detail v)
 	vf 		o;
 
 	int 	i=v.misc.w;
-	float4  m0=array[i+0];
-	float4  m1=array[i+1];
-	float4  m2=array[i+2];
-	float4  c0=array[i+3];
 
 	float4 	pos;
- 	pos.x=dot	(m0,v.pos);
- 	pos.y=dot	(m1,v.pos);
- 	pos.z=dot	(m2,v.pos);
+ 	pos.x=dot	(array[i],v.pos);
+ 	pos.y=dot	(array[i+1],v.pos);
+ 	pos.z=dot	(array[i+2],v.pos);
 	pos.w=1;
 
 	o.hpos=mul	(m_WVP,pos);
-	o.C=c0;
+	o.C=array[i+3];
 	o.tc.xy=(v.misc*consts).xy;
 
 	return o;

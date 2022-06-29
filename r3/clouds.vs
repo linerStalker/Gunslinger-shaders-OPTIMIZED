@@ -21,10 +21,7 @@ vf main (vi v)
 	vf 		o;
 
 	o.hpos=mul		(m_WVP,v.p);
-	
 
-
-	
 	float2  d0=v.dir.xy*2-1;
 	float2  d1=v.dir.wz*2-1;
 	float2 	_0=v.p.xz*CLOUD_TILE0+d0*timers.z*CLOUD_SPEED0;
@@ -34,7 +31,6 @@ vf main (vi v)
 
 	o.color=v.color;
 	o.color.w*=pow		(v.p.y,25);
-
 
 	float	scale=s_tonemap.Load(int3(0,0,0)).x;
 

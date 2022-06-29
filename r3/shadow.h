@@ -154,18 +154,18 @@ float shadow_extreme_quality(float3 tc)
 
 			d4.w=s_smap.SampleLevel(smp_nofilter,tc.xy,0,int2(col,row)).x;
 			float b=(tc.z<=d4.w)?(0.0f):(1.0f);
-			vmask[col+FS2+0]+=((tc.z<=d4.w)?(uint(1)<<uint(row+FS2+0)):uint(0));
+			vmask[col+FS2]+=((tc.z<=d4.w)?(uint(1)<<uint(row+FS2)):uint(0));
 			blockerCount  +=b;
             avgBlockerDepth+=d4.w*b;
 			
 			d4.z=s_smap.SampleLevel(smp_nofilter,tc.xy,0,int2(col+1,row)).x;
 			b=(tc.z<=d4.z)? 0.0f:1.0f;
-			vmask[col+FS2+1]+=((tc.z<=d4.z)?(uint(1)<<uint(row+FS2+0)):uint(0));
+			vmask[col+FS2+1]+=((tc.z<=d4.z)?(uint(1)<<uint(row+FS2)):uint(0));
 			blockerCount  +=b;
             avgBlockerDepth+=d4.z*b;
 			
 			d4.x=s_smap.SampleLevel(smp_nofilter,tc.xy,0,int2(col,row+1)).x;
-			vmask[col+FS2+0]+=((tc.z<=d4.x)?(uint(1)<<uint(row+FS2+1)):uint(0));
+			vmask[col+FS2]+=((tc.z<=d4.x)?(uint(1)<<uint(row+FS2+1)):uint(0));
 			b=(tc.z<=d4.x)? 0.0f:1.0f;
 			blockerCount  +=b;
             avgBlockerDepth+=d4.x*b;

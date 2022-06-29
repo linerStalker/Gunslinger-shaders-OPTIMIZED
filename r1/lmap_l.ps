@@ -9,12 +9,7 @@ struct 	v2p
 
 half4 	main_ps_1_1	(v2p I)	:COLOR
 {
-	half4	t_lmap=tex2D		(s_lmap,I.tc0);
-
-	half3 	l_base=t_lmap.rgb;
-	half3	l_hemi=I.c0*p_hemi(I.tc1);
-	half  	l_sun=t_lmap.a;
-	half3	light=L_ambient+l_base+l_hemi;
-
-	return  half4	(light,l_sun);
+	half4 t_lmap=tex2D(s_lmap,I.tc0);
+	half3 light=t_lmap.rgb+I.c0*p_hemi(I.tc1)+L_ambient;
+	return  half4(light,t_lmap.a);
 }

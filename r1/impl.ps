@@ -19,6 +19,6 @@ half4 	main_ps_1_1	(v2p I)	:COLOR
 	half3	light=L_ambient+l_base+l_sun+l_hemi;
 
 	half3	final=light*t_base*2;
-	
+
 	return  half4	(final.rgb,1);
 }

@@ -18,7 +18,7 @@ vf main (v_lmap v)
 	o.hpos=mul			(m_VP,v.P);
 	o.tc0=unpack_tc_base	(v.uv0.xy,v.T.w,v.B.w);
 	o.tc1=o.tc0;
-	o.c0=v_hemi		();
+	o.c0=v_hemi();
 	o.c1=v_sun			(N);
 	o.fog=calc_fogging 		(v.P);
 

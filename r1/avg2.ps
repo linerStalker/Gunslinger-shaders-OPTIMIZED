@@ -6,13 +6,12 @@ struct 	v2p
  	half2 	tc1:		TEXCOORD1;
 };
 
-uniform sampler2D 	s_base0;
-uniform sampler2D 	s_base1;
+uniform sampler2D 	s_base0,s_base1;
 
 half4 	main_ps_1_1	(v2p I)	:COLOR
 {
-	half4	t_0=tex2D		(s_base0,I.tc0);
-	half4	t_1=tex2D		(s_base1,I.tc1);
+	half4	t_0=tex2D(s_base0,I.tc0);
+	half4	t_1=tex2D(s_base1,I.tc1);
 	
 	return  (t_0+t_1)*.5;
 }

@@ -2,19 +2,12 @@
 #define  WMARK_H
 #include "common.h"
 
-#define	NORMAL_SHIFT	0.007f
-#define	MIN_SHIFT		0.003f
-#define	MAX_SHIFT		0.011f
-#define RANGE			100.f
-
-float4 	wmark_shift 	(float3 pos,float3 norm)
+float4 	wmark_shift 	(float3 P,float3 xyz)
 {
-	float3	P=pos;
-	float3 	N=norm;
 	float3	sd=eye_position-P;
 	float 	d=length(sd);
-	float 	s=lerp(MIN_SHIFT,MAX_SHIFT,d);
-	P+=N.xyz*NORMAL_SHIFT;
+	float 	s=lerp(0.003f,0.011f,d);
+	P+=xyz*0.007f;
 	P-=normalize(eye_direction+normalize(P-eye_position))*s;
 	return	float4	(P,1.f);
 }

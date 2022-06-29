@@ -9,7 +9,7 @@ struct 	v2p
 
 half4 	main_ps_1_1	(v2p I)	:COLOR
 {
-	half4	t_base=tex2D		(s_base,I.tc0);
+	half4	t_base=tex2D(s_base,I.tc0);
 	half3	final=t_base*I.c0*2;
 
 	return  half4	(final,t_base.a);
